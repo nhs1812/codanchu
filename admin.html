@@ -65,8 +65,8 @@ button{cursor:pointer;font-family:inherit;border:none;outline:none}
 .hud-pip.now{background:var(--red2);border-color:var(--red2);box-shadow:0 0 8px var(--rg);animation:pulse 1.3s infinite}
 /* ADMIN GAME */
 #s-admin{background:var(--ink);flex-direction:column;overflow:hidden}
-.admin-body{flex:1;display:grid;grid-template-columns:160px 1fr 160px;gap:5px;padding:5px;overflow:hidden;min-height:0}
-.aside{display:flex;flex-direction:column;gap:5px;overflow:hidden;min-height:0}
+.admin-body{flex:1;display:grid;grid-template-columns:130px 1fr 140px;gap:3px;padding:3px;overflow:hidden;min-height:0}
+.aside{display:flex;flex-direction:column;gap:3px;overflow:hidden;min-height:0}
 .aside-card{background:rgba(15,9,24,.98);border:1px solid rgba(212,160,23,.1);border-radius:12px;padding:10px;position:relative;overflow:hidden;flex-shrink:0}
 .aside-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(212,160,23,.25),transparent)}
 .aside-hd{font-size:7.5px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(212,160,23,.32);margin-bottom:8px}
@@ -119,20 +119,11 @@ button{cursor:pointer;font-family:inherit;border:none;outline:none}
 .cell-tokens{position:absolute;bottom:1px;right:1px;display:flex;flex-wrap:wrap;gap:1px;z-index:4;max-width:85%;pointer-events:none}
 .token-dot{border-radius:2px;padding:1px;font-size:clamp(5px,.75vw,9px);line-height:1}
 /* BOARD CENTER */
-.bcenter{position:absolute;top:calc(100%/11);left:calc(100%/11);right:calc(100%/11);bottom:calc(100%/11);display:flex;flex-direction:column;align-items:center;justify-content:space-between;background:radial-gradient(ellipse,rgba(28,10,50,.97),rgba(7,4,11,.99));border:1px solid rgba(212,160,23,.1);border-radius:4px;overflow:hidden;padding:4px 3px}
-.bc-top{display:flex;flex-direction:column;align-items:center;gap:2px;width:100%}
-.bc-flag-row{display:flex;justify-content:center}
-.orbit-wrap{position:relative;flex-shrink:0}
-.orbit-ring1,.orbit-ring2,.orbit-ring3{position:absolute;border-radius:50%;border:1px solid;pointer-events:none}
-.orbit-ring1{border-color:rgba(192,57,43,.18);animation:orbSpin 22s linear infinite}
-.orbit-ring2{border-color:rgba(212,160,23,.13);animation:orbSpinR 16s linear infinite}
-.orbit-ring3{border-color:rgba(46,204,113,.1);animation:orbSpin 30s linear infinite}
-.orbit-center-star{animation:orbSpin 20s linear infinite;display:block;filter:drop-shadow(0 0 5px rgba(212,160,23,.8))}
-.orbit-nodes{pointer-events:none}
-.orbit-node{position:absolute;transform:translate(-50%,-50%);font-size:10px;filter:drop-shadow(0 0 3px rgba(212,160,23,.5))}
-.bc-village{display:block;flex-shrink:0;border-radius:3px}
-.bc-title{font-family:'Dela Gothic One',sans-serif;background:linear-gradient(135deg,#F1C40F,#E74C3C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;line-height:1.1}
-.bc-sub{color:rgba(212,160,23,.35);font-weight:700;letter-spacing:.5px;text-align:center}
+.bcenter{position:absolute;top:calc(100%/11);left:calc(100%/11);right:calc(100%/11);bottom:calc(100%/11);display:flex;flex-direction:column;align-items:center;justify-content:space-between;background:radial-gradient(ellipse,rgba(18,6,36,.98),rgba(5,2,12,.99));border:1px solid rgba(212,160,23,.15);border-radius:6px;overflow:hidden;padding:3px 2px}
+.bc-img{width:100%;flex:1;object-fit:cover;border-radius:4px;display:block;min-height:0}
+.bc-img-placeholder{width:100%;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,rgba(30,10,60,.9),rgba(8,3,18,.95));border-radius:4px;border:1.5px dashed rgba(212,160,23,.25);position:relative;overflow:hidden;cursor:pointer}
+.bc-img-placeholder:hover{border-color:rgba(212,160,23,.5);background:linear-gradient(160deg,rgba(40,15,80,.9),rgba(12,5,25,.95))}
+.bc-flag-overlay{position:absolute;top:6px;left:8px;pointer-events:none}
 .dice-row{display:flex;gap:4px;align-items:center}
 .die{border-radius:6px;background:linear-gradient(145deg,#FFF8E0,#EDD090);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;box-shadow:3px 3px 0 rgba(0,0,0,.5);transform-style:preserve-3d;transition:all .12s;flex-shrink:0}
 .die.rolling{animation:dieRoll .1s steps(1) infinite}
@@ -438,8 +429,11 @@ let boardBuilt=false;
 function buildAdminBoard(){
   if(boardBuilt)return;boardBuilt=true;
   const board=$('board');
-  const sz=Math.min(window.innerWidth-340,window.innerHeight-56,700);
-  board.style.width=board.style.height=Math.max(280,sz)+'px';
+  // Use maximum available space - prefer height-constrained square
+  const avW=window.innerWidth-280; // minus both sidebars
+  const avH=window.innerHeight-52; // minus HUD
+  const sz=Math.max(300,Math.min(avW,avH,820));
+  board.style.width=board.style.height=sz+'px';
   const bg=$('board-grid');bg.innerHTML='';
   function cellPos(i){if(i<11)return{r:10,c:10-i};if(i<21)return{r:10-(i-10),c:0};if(i<31)return{r:0,c:i-20};return{r:i-30,c:10}}
   for(let row=0;row<11;row++){for(let col=0;col<11;col++){
@@ -459,102 +453,121 @@ function buildAdminBoard(){
 
 function buildBoardCenter(){
   const bc=$('bcenter');const board=$('board');
-  const s=board.offsetWidth;
-  const diceSz=Math.round(s*.038),diceFsz=Math.round(s*.026);
-  const dblDotSz=Math.round(s*.01);
-  const titleFsz=Math.max(10,Math.round(s*.02));
-  const cw=Math.round(s*.72),ch=Math.round(s*.38);
+  const sz=board.offsetWidth;
+  const cell=sz/11;
+  const innerSz=sz-cell*2; // inner area excluding border cells
+  const diceSz=Math.round(sz*.038),diceFsz=Math.round(sz*.026);
+  const dotSz=Math.round(sz*.011);
+  const titleFsz=Math.max(8,Math.round(sz*.017));
+  const btnFsz=Math.round(sz*.011);
+
+  // Flag dimensions - fits nicely in top-left of center
+  const fw=Math.round(sz*.13),fh=Math.round(fw*.65);
+  const pw=Math.max(3,Math.round(fw*.028));
+
   bc.innerHTML=`
-    <div style="display:flex;flex-direction:column;align-items:center;justify-content:space-between;height:100%;width:100%;padding:3px 2px;gap:2px;overflow:hidden">
-      <canvas id="bc-canvas" width="${cw}" height="${ch}" style="border-radius:6px;flex-shrink:0;max-width:100%"></canvas>
-      <div style="font-family:'Dela Gothic One',sans-serif;font-size:${titleFsz}px;background:linear-gradient(135deg,#FFF9C4,#F1C40F,#E74C3C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;line-height:1;letter-spacing:1px;flex-shrink:0">CỜ DÂN CHỦ</div>
-      <div class="dice-row" style="justify-content:center;flex-shrink:0"><div class="die" id="die1" style="width:${diceSz}px;height:${diceSz}px;font-size:${diceFsz}px">🎲</div><div class="die" id="die2" style="width:${diceSz}px;height:${diceSz}px;font-size:${diceFsz}px">🎲</div></div>
-      <div class="double-streak" style="justify-content:center;flex-shrink:0"><div class="dstreak-dot" id="ds1" style="width:${dblDotSz}px;height:${dblDotSz}px"></div><div class="dstreak-dot" id="ds2" style="width:${dblDotSz}px;height:${dblDotSz}px"></div><div class="dstreak-dot" id="ds3" style="width:${dblDotSz}px;height:${dblDotSz}px"></div><span style="font-size:${Math.round(s*.006)}px;font-weight:700;color:rgba(192,57,43,.55);letter-spacing:.5px;margin-left:2px">ĐÔI</span></div>
-      <button class="roll-btn" id="roll-btn-bc" style="font-size:${Math.round(s*.011)}px;flex-shrink:0" onclick="doRoll()">🎲 TUNG XÚC XẮC</button>
-    </div>`;
-  // Draw themed artwork on canvas
+  <div style="width:100%;height:100%;display:flex;flex-direction:column;gap:0;overflow:hidden">
+
+    <!-- IMAGE AREA - fills most of center -->
+    <div id="bc-img-zone" style="flex:1;min-height:0;position:relative;cursor:pointer;overflow:hidden;border-radius:4px 4px 0 0"
+         title="Nhấn để tải ảnh lên" onclick="$('bc-file').click()">
+      <input id="bc-file" type="file" accept="image/*" style="display:none"
+             onchange="(function(inp){const f=inp.files[0];if(!f)return;const url=URL.createObjectURL(f);const z=$('bc-img-zone');const ph=$('bc-ph');if(ph)ph.style.display='none';let img=z.querySelector('img.bc-bg');if(!img){img=document.createElement('img');img.className='bc-bg';img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:4px 4px 0 0';z.appendChild(img);}img.src=url;})(this)">
+
+      <!-- Placeholder shown before image -->
+      <div id="bc-ph" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,rgba(40,15,70,.95),rgba(6,2,12,.98));border:1.5px dashed rgba(212,160,23,.2);border-radius:4px 4px 0 0;gap:6px">
+        <div style="font-size:clamp(28px,4vw,48px);opacity:.3;filter:grayscale(1)">🖼️</div>
+        <div style="font-family:'Be Vietnam Pro',sans-serif;font-size:clamp(8px,1.1vw,12px);font-weight:800;color:rgba(212,160,23,.35);letter-spacing:1.5px;text-align:center;line-height:1.7">NHẤN ĐỂ TẢI ẢNH LÊN<br><span style="font-weight:600;opacity:.6;font-size:.85em">PNG · JPG · WEBP</span></div>
+      </div>
+
+      <!-- Waving flag overlay (always visible) -->
+      <div id="bc-flag" style="position:absolute;top:8px;left:10px;pointer-events:none;z-index:2"></div>
+
+      <!-- Title overlay at bottom of image area -->
+      <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(4,1,8,.92));padding:8px 10px 5px;display:flex;align-items:center;justify-content:space-between;z-index:2">
+        <span style="font-family:'Dela Gothic One',sans-serif;font-size:${titleFsz}px;background:linear-gradient(135deg,#FFF9C4,#F1C40F,#E74C3C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:1px">CỜ DÂN CHỦ</span>
+        <div style="display:flex;align-items:center;gap:3px">
+          <div class="die" id="die1" style="width:${diceSz}px;height:${diceSz}px;font-size:${diceFsz}px">🎲</div>
+          <div class="die" id="die2" style="width:${diceSz}px;height:${diceSz}px;font-size:${diceFsz}px">🎲</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTROLS BAR -->
+    <div style="flex-shrink:0;background:rgba(8,4,14,.98);border-top:1px solid rgba(212,160,23,.1);padding:3px 5px;display:flex;align-items:center;gap:4px;border-radius:0 0 4px 4px">
+      <div class="double-streak" style="flex-shrink:0">
+        <div class="dstreak-dot" id="ds1" style="width:${dotSz}px;height:${dotSz}px"></div>
+        <div class="dstreak-dot" id="ds2" style="width:${dotSz}px;height:${dotSz}px"></div>
+        <div class="dstreak-dot" id="ds3" style="width:${dotSz}px;height:${dotSz}px"></div>
+        <span style="font-size:${Math.round(sz*.0055)}px;font-weight:700;color:rgba(192,57,43,.5);letter-spacing:.4px;margin-left:2px">ĐÔI</span>
+      </div>
+      <button class="roll-btn" id="roll-btn-bc" style="flex:1;font-size:${btnFsz}px;padding:5px 4px" onclick="doRoll()">🎲 TUNG XÚC XẮC</button>
+    </div>
+
+  </div>`;
+
+  // Build animated SVG flag
   setTimeout(()=>{
-    const canvas=$('bc-canvas');if(!canvas)return;
-    const ctx=canvas.getContext('2d');
-    const W=canvas.width,H=canvas.height;
-    // Sky gradient
-    const sky=ctx.createLinearGradient(0,0,0,H);
-    sky.addColorStop(0,'#050210');sky.addColorStop(0.5,'#0D0525');sky.addColorStop(1,'#1A0535');
-    ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
-    // Stars
-    ctx.fillStyle='rgba(255,255,255,0.7)';
-    [[.12,.08],[.22,.18],[.35,.05],[.55,.12],[.78,.06],[.88,.15],[.95,.08],[.08,.22]].forEach(([rx,ry])=>{ctx.beginPath();ctx.arc(W*rx,H*ry,0.9,0,Math.PI*2);ctx.fill();});
-    // Ground
-    const grd=ctx.createLinearGradient(0,H*.62,0,H);
-    grd.addColorStop(0,'#0A2810');grd.addColorStop(1,'#051A08');
-    ctx.fillStyle=grd;ctx.fillRect(0,H*.62,W,H*.38);
-    // Parliament building
-    const bx=W*.28,bw=W*.44,bh=H*.38,by=H*.62-bh;
-    // Main body
-    const bg=ctx.createLinearGradient(bx,by,bx,by+bh);
-    bg.addColorStop(0,'#2A1A4A');bg.addColorStop(1,'#1A0E30');
-    ctx.fillStyle=bg;ctx.fillRect(bx,by+bh*.15,bw,bh*.85);
-    // Columns
-    ctx.fillStyle='rgba(180,150,230,0.18)';
-    for(let i=0;i<6;i++){ctx.fillRect(bx+bw*.08+i*(bw*.14),by+bh*.15,bw*.07,bh*.85);}
-    // Roof/pediment
-    ctx.fillStyle='#3A2060';
-    ctx.beginPath();ctx.moveTo(bx,by+bh*.15);ctx.lineTo(bx+bw/2,by);ctx.lineTo(bx+bw,by+bh*.15);ctx.closePath();ctx.fill();
-    ctx.strokeStyle='rgba(212,160,23,0.5)';ctx.lineWidth=1.5;ctx.stroke();
-    // Door arch
-    ctx.fillStyle='rgba(212,160,23,0.15)';
-    ctx.beginPath();ctx.arc(bx+bw/2,by+bh*.75,bw*.07,Math.PI,0);ctx.fillRect(bx+bw*.43,by+bh*.75,bw*.14,bh*.25);ctx.fill();
-    // Gold trim
-    ctx.strokeStyle='rgba(212,160,23,0.4)';ctx.lineWidth=1;
-    ctx.strokeRect(bx+1,by+bh*.15,bw-2,bh*.85);
-    // Star on pediment
-    const sx=bx+bw/2,sy=by+bh*.06,sr=Math.min(bw,bh)*.1;
-    ctx.fillStyle='#FFE033';
-    ctx.beginPath();for(let i=0;i<5;i++){const a=i*Math.PI*2/5-Math.PI/2;const ia=(i+.5)*Math.PI*2/5-Math.PI/2;ctx.lineTo(sx+sr*Math.cos(a),sy+sr*Math.sin(a));ctx.lineTo(sx+sr*.42*Math.cos(ia),sy+sr*.42*Math.sin(ia));}ctx.closePath();ctx.fill();
-    // Waving flag — pole left side
-    const px=W*.08,py=H*.08,ph=H*.58,fw2=W*.18,fh2=H*.36;
+    const flagEl=$('bc-flag');if(!flagEl)return;
+    const ns='http://www.w3.org/2000/svg';
+    const svg=document.createElementNS(ns,'svg');
+    svg.setAttribute('width',fw+pw+2);svg.setAttribute('height',fh+4);
+    svg.setAttribute('viewBox',`0 0 ${fw+pw+2} ${fh+4}`);
+    svg.style.cssText='display:block;overflow:visible;filter:drop-shadow(0 2px 10px rgba(0,0,0,.8))';
+
+    // Pole gradient def
+    const defs=document.createElementNS(ns,'defs');
+    const lg=document.createElementNS(ns,'linearGradient');
+    lg.id='pole-g';lg.setAttribute('x1','0');lg.setAttribute('x2','1');lg.setAttribute('y1','0');lg.setAttribute('y2','0');
+    [['0%','#FFE066'],['35%','#8A6000'],['70%','#FFE066'],['100%','#8A6000']].forEach(([o,c])=>{
+      const s2=document.createElementNS(ns,'stop');s2.setAttribute('offset',o);s2.setAttribute('stop-color',c);lg.appendChild(s2);
+    });
+    defs.appendChild(lg);svg.appendChild(defs);
+
     // Pole
-    const polG=ctx.createLinearGradient(px,0,px+3,0);
-    polG.addColorStop(0,'#FFE066');polG.addColorStop(0.5,'#9A7000');polG.addColorStop(1,'#FFE066');
-    ctx.fillStyle=polG;ctx.fillRect(px,py,3,ph);
-    // Flag wave using sine curve (animated via RAF)
-    drawFlag(ctx,px+3,py,fw2,fh2,0);
-    // Light rays from building
-    ctx.save();ctx.globalAlpha=0.04;ctx.fillStyle='#FFE033';
-    for(let i=0;i<8;i++){const a=-Math.PI/2+i*Math.PI/4;ctx.beginPath();ctx.moveTo(bx+bw/2,by+bh*.06);ctx.lineTo(bx+bw/2+Math.cos(a)*W*.8,by+bh*.06+Math.sin(a)*H*.8);ctx.lineTo(bx+bw/2+Math.cos(a+0.12)*W*.8,by+bh*.06+Math.sin(a+0.12)*H*.8);ctx.closePath();ctx.fill();}ctx.restore();
-    // Citizens silhouettes
-    const ppl=[[.18,.88],[.22,.85],[.75,.88],[.79,.85],[.82,.9],[.85,.87]];
-    ppl.forEach(([rx,ry])=>{const ph2=H*(1-ry)*.5;const px2=W*rx;ctx.fillStyle='rgba(100,70,180,0.6)';ctx.beginPath();ctx.arc(px2,H*ry-ph2*.3,ph2*.15,0,Math.PI*2);ctx.fill();ctx.fillRect(px2-ph2*.1,H*ry-ph2*.28,ph2*.2,ph2*.28);});
-    // Animate waving flag
-    let tick=0;
-    function animateFlag(){
-      // Redraw only flag area
-      const sky2=ctx.createLinearGradient(0,0,0,H*.65);
-      sky2.addColorStop(0,'#050210');sky2.addColorStop(0.5,'#0D0525');sky2.addColorStop(1,'#1A0535');
-      ctx.fillStyle=sky2;ctx.fillRect(0,0,W*.35,H*.65);
-      ctx.fillStyle='rgba(255,255,255,0.7)';
-      [[.12,.08],[.22,.18],[.35,.05],[.08,.22]].forEach(([rx,ry])=>{ctx.beginPath();ctx.arc(W*rx,H*ry,0.9,0,Math.PI*2);ctx.fill();});
-      ctx.fillStyle=polG;ctx.fillRect(px,py,3,ph);
-      drawFlag(ctx,px+3,py,fw2,fh2,tick);
-      tick+=0.06;requestAnimationFrame(animateFlag);
+    const pole=document.createElementNS(ns,'rect');
+    pole.setAttribute('x','0');pole.setAttribute('y','0');
+    pole.setAttribute('width',pw);pole.setAttribute('height',fh+4);
+    pole.setAttribute('rx','1.5');pole.setAttribute('fill','url(#pole-g)');
+    svg.appendChild(pole);
+
+    // Flag body & star paths
+    const flagPath=document.createElementNS(ns,'path');
+    flagPath.setAttribute('fill','#D32020');
+    const starPoly=document.createElementNS(ns,'polygon');
+    starPoly.setAttribute('fill','#FFE033');
+    starPoly.style.cssText='filter:drop-shadow(0 0 3px rgba(255,220,0,.9))';
+    svg.appendChild(flagPath);svg.appendChild(starPoly);
+    flagEl.appendChild(svg);
+
+    // Animate wave
+    function starPoints(cx,cy,r,ir){
+      let p='';
+      for(let i=0;i<10;i++){const a=i*Math.PI/5-Math.PI/2;const ri=i%2===0?r:ir;p+=`${(cx+ri*Math.cos(a)).toFixed(1)},${(cy+ri*Math.sin(a)).toFixed(1)} `;}
+      return p.trim();
     }
-    function drawFlag(ctx,x,y,fw,fh,t){
-      // Create waving red flag with wavy path
-      ctx.save();
-      const pts=[];const segs=20;
-      for(let i=0;i<=segs;i++){const fx=x+fw*i/segs;const wave=Math.sin(i/segs*Math.PI*2-t)*fh*.1*(i/segs);pts.push([fx,y+wave]);}
-      const bpts=[];
-      for(let i=0;i<=segs;i++){const fx=x+fw*i/segs;const wave=Math.sin(i/segs*Math.PI*2-t)*fh*.1*(i/segs);bpts.push([fx,y+fh+wave]);}
-      ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);pts.forEach(p=>ctx.lineTo(p[0],p[1]));for(let i=bpts.length-1;i>=0;i--)ctx.lineTo(bpts[i][0],bpts[i][1]);ctx.closePath();
-      ctx.fillStyle='#C8001E';ctx.fill();
-      // Star
-      const scx=x+fw*.38,scy=y+fh*.46,sr2=fh*.17;
-      ctx.fillStyle='#FFE033';
-      ctx.beginPath();for(let i=0;i<5;i++){const a=i*Math.PI*2/5-Math.PI/2;const ia=(i+.5)*Math.PI*2/5-Math.PI/2;ctx.lineTo(scx+sr2*Math.cos(a),scy+sr2*Math.sin(a));ctx.lineTo(scx+sr2*.42*Math.cos(ia),scy+sr2*.42*Math.sin(ia));}ctx.closePath();ctx.fill();
-      ctx.restore();
+    let t=0;
+    function anim(){
+      const segs=18,ox=pw+1,oy=2;
+      let topPts=[],botPts=[];
+      for(let i=0;i<=segs;i++){
+        const fx=ox+fw*i/segs;
+        const amp=fh*.1*(i/segs);
+        const wave=Math.sin(i/segs*Math.PI*2-t)*amp;
+        topPts.push(`${fx.toFixed(1)},${(oy+wave).toFixed(1)}`);
+        botPts.push(`${fx.toFixed(1)},${(oy+fh+wave).toFixed(1)}`);
+      }
+      flagPath.setAttribute('d',`M ${ox},${oy} L ${topPts.join(' L ')} L ${botPts.reverse().join(' L ')} Z`);
+      // Star position warps with wave
+      const scx=ox+fw*.37,scy=oy+fh*.46;
+      const swarp=Math.sin(.37*Math.PI*2-t)*fh*.1*.37;
+      const sr=fh*.17;
+      starPoly.setAttribute('points',starPoints(scx,scy+swarp,sr,sr*.42));
+      t+=0.055;
+      requestAnimationFrame(anim);
     }
-    animateFlag();
-  },80);
+    anim();
+  },60);
 }
 
 function renderAdmin(s){
@@ -636,7 +649,7 @@ async function doMove(s,pi,steps,isDouble){
     p.pos=npos;await apiSaveP(ord[pi],p);
     const cel=document.getElementById(`ac${npos}`);
     if(cel){cel.classList.add('hl');setTimeout(()=>cel.classList.remove('hl'),550)}
-    const rs=await getState();G=rs;renderAdmin(rs);await sleep(120);
+    const rs=await getState();G=rs;renderAdmin(rs);await sleep(50);
   }
   _moving=false;
   const s3=await getState();await landOn(s3,pi,isDouble);
@@ -687,133 +700,216 @@ async function landOn(s,pi,isDouble){
 function doMiniGame(s,pi,isDouble,mtype){
   const ord=s.order||[];const p=s.players[ord[pi]];
   const mg=$('m-game');
+  const afterGame=async(pts,label)=>{
+    if(pts>0){const np={...s.players[ord[pi]],score:(s.players[ord[pi]].score||0)+pts};await apiSaveP(ord[pi],np);floatScore(pts,48,55);}
+    addLog(`🎮 ${p.emoji} Mini[${mtype}]: ${label}`);
+    $('m-ok').style.display='block';$('m-ok').onclick=async()=>{closeModal();const ns=await getState();await endTurn(ns,isDouble)};
+  };
+
   const GAMES={
-    tf:{name:'✅ ĐÚNG hay SAI?',run:()=>{
+    // 🧩 Ghép mảnh câu hỏi - kéo thả
+    tf:{name:'⚡ NHANH TAY - ĐÚNG HAY SAI?',run:()=>{
       const items=[
-        {t:'Điều 2 HP 2013: Quyền lực NN thuộc về Nhân dân.',a:true},
-        {t:'Đảng CSVN lãnh đạo Nhà nước bằng mệnh lệnh hành chính.',a:false},
-        {t:'MTTQ có chức năng phản biện xã hội và giám sát.',a:true},
-        {t:'DC XHCN chỉ dành cho giai cấp công nhân.',a:false},
-        {t:'6 quyền DC cơ sở gồm: Dân biết, bàn, làm, kiểm tra, giám sát, thụ hưởng.',a:true},
-        {t:'NN pháp quyền XHCN đứng trên Hiến pháp và pháp luật.',a:false},
+        {t:'HP 2013 Điều 2: Quyền lực NN thuộc về Nhân dân',a:true},
+        {t:'Đảng lãnh đạo bằng mệnh lệnh hành chính trực tiếp',a:false},
+        {t:'MTTQ có chức năng phản biện XH và giám sát',a:true},
+        {t:'DC XHCN chỉ dành riêng cho giai cấp công nhân',a:false},
+        {t:'6 quyền DC: biết→bàn→làm→kiểm tra→giám sát→thụ hưởng',a:true},
+        {t:'NN pháp quyền XHCN đứng TRÊN Hiến pháp',a:false},
+        {t:'Nhân dân thực hiện DC qua 2 hình thức: trực tiếp và đại diện',a:true},
+        {t:'UBND do Chính phủ trung ương bổ nhiệm trực tiếp',a:false},
       ];
-      const q=items[~~(Math.random()*items.length)];
-      let done=false;
-      mg.innerHTML=`<div style="padding:10px 0"><div style="font-size:14px;font-weight:700;color:var(--pp);text-align:center;margin-bottom:16px;line-height:1.5">"${q.t}"</div><div style="display:flex;gap:10px;justify-content:center"><button id="tf-t" style="flex:1;padding:14px;border-radius:12px;background:rgba(46,204,113,.12);border:2px solid rgba(46,204,113,.4);color:#80FFB0;font-family:'Dela Gothic One',sans-serif;font-size:16px;cursor:pointer">✅ ĐÚNG</button><button id="tf-f" style="flex:1;padding:14px;border-radius:12px;background:rgba(192,57,43,.12);border:2px solid rgba(192,57,43,.4);color:#FFB0B0;font-family:'Dela Gothic One',sans-serif;font-size:16px;cursor:pointer">❌ SAI</button></div><div id="tf-fb" style="margin-top:12px;text-align:center;font-size:13px;font-weight:700;min-height:20px"></div></div>`;
-      const handle=async(ans)=>{if(done)return;done=true;
-        const ok=ans===q.a;const fb=$('tf-fb');
-        fb.innerHTML=ok?`<span style="color:#66FFAA">✅ ĐÚNG! +10đ</span>`:`<span style="color:#FF9999">❌ SAI! Đáp án: ${q.a?'ĐÚNG':'SAI'}</span>`;
-        if(ok){const np={...s.players[ord[pi]],score:(s.players[ord[pi]].score||0)+10};await apiSaveP(ord[pi],np);floatScore(10,48,55);addLog(`🎮 ${p.emoji} Mini TF: ĐÚNG +10`);}
-        else addLog(`🎮 ${p.emoji} Mini TF: SAI`);
-        $('m-ok').style.display='block';$('m-ok').onclick=async()=>{closeModal();const ns=await getState();await endTurn(ns,isDouble)};
-      };
-      $('tf-t').onclick=()=>handle(true);$('tf-f').onclick=()=>handle(false);
+      let qi=0,score=0;const total=5;const sel=items.sort(()=>Math.random()-.5).slice(0,total);
+      const render=()=>{
+        if(qi>=total){const pts=score*4;
+          mg.innerHTML=`<div style="text-align:center;padding:16px"><div style="font-size:48px;margin-bottom:8px">${score>=4?'🏆':score>=3?'🥈':'🥉'}</div><div style="font-family:'Dela Gothic One',sans-serif;font-size:22px;color:var(--gold2)">${score}/${total} ĐÚNG</div><div style="font-size:13px;color:rgba(245,240,255,.5);margin-top:4px">+${pts} điểm</div></div>`;
+          afterGame(pts,`${score}/${total} đúng +${pts}`);return;}
+        const q=sel[qi];
+        mg.innerHTML=`<div style="padding:6px 0"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:10px;color:rgba(212,160,23,.5);font-weight:700">Câu ${qi+1}/${total}</span><span style="font-family:'Dela Gothic One',sans-serif;font-size:13px;color:var(--gold2)">${score} ✓</span></div>
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px;font-size:13px;font-weight:700;color:var(--pp);text-align:center;line-height:1.6;margin-bottom:14px">"${q.t}"</div>
+        <div style="display:flex;gap:10px"><button id="tf-t" style="flex:1;padding:16px 8px;border-radius:14px;background:linear-gradient(135deg,rgba(26,92,42,.3),rgba(46,204,113,.15));border:2px solid rgba(46,204,113,.5);color:#80FFB0;font-family:'Dela Gothic One',sans-serif;font-size:18px;cursor:pointer;transition:all .15s">✅<br><span style="font-size:11px">ĐÚNG</span></button>
+        <button id="tf-f" style="flex:1;padding:16px 8px;border-radius:14px;background:linear-gradient(135deg,rgba(100,0,0,.3),rgba(192,57,43,.15));border:2px solid rgba(192,57,43,.5);color:#FFB0B0;font-family:'Dela Gothic One',sans-serif;font-size:18px;cursor:pointer;transition:all .15s">❌<br><span style="font-size:11px">SAI</span></button></div>
+        <div id="tf-fb" style="min-height:22px;margin-top:8px;text-align:center;font-size:12px;font-weight:700"></div></div>`;
+        const handle=async(ans)=>{
+          const ok=ans===q.a;if(ok)score++;
+          $('tf-fb').innerHTML=ok?`<span style="color:#66FFAA">✅ Chính xác!</span>`:`<span style="color:#FF9999">❌ Sai! Đáp án: ${q.a?'ĐÚNG':'SAI'}</span>`;
+          document.querySelectorAll('#tf-t,#tf-f').forEach(b=>b.disabled=true);
+          await sleep(700);qi++;render();
+        };
+        $('tf-t').onclick=()=>handle(true);$('tf-f').onclick=()=>handle(false);
+      };render();
     }},
-    order:{name:'🔢 SẮP XẾP THỨ TỰ',run:()=>{
+
+    // 🎯 Bắn tên - click đúng từ khoá
+    order:{name:'🎯 BẮN TÊN — CLICK TỪ KHOÁ ĐÚNG!',run:()=>{
+      const rounds=[
+        {q:'Chọn TẤT CẢ từ thuộc về "6 quyền DC cơ sở":',good:['Dân biết','Dân bàn','Dân làm','Dân thụ hưởng','Dân giám sát'],bad:['Dân xin','Dân cầu','Dân mua','Dân tự quyết','Bầu cử tự do']},
+        {q:'Chọn các yếu tố thuộc "Tam trụ HTCT XHCN":',good:['Đảng lãnh đạo','NN quản lý','Nhân dân làm chủ'],bad:['Tư bản sở hữu','Quân đội cai trị','Thị trường tự do','Đa đảng tranh cử']},
+        {q:'Chọn các nguyên tắc BẦU CỬ theo HP 2013:',good:['Phổ thông','Bình đẳng','Trực tiếp','Bỏ phiếu kín'],bad:['Gián tiếp','Hạn chế','Công khai phiếu','Chỉ đảng viên']},
+      ];
+      const r=rounds[~~(Math.random()*rounds.length)];
+      const all=[...r.good.map(t=>({t,ok:true})),...r.bad.map(t=>({t,ok:false}))].sort(()=>Math.random()-.5);
+      let hits=0,misses=0,done=false;
+      mg.innerHTML=`<div style="padding:4px 0"><div style="font-size:11px;font-weight:700;color:rgba(245,240,255,.6);text-align:center;margin-bottom:10px;line-height:1.5">${r.q}</div>
+      <div id="shoot-grid" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center"></div>
+      <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:11px;font-weight:700"><span style="color:#66FFAA">✅ ${hits}/${r.good.length}</span><span style="color:#FF9999">❌ ${misses}</span></div>
+      <div id="shoot-fb" style="text-align:center;font-size:12px;margin-top:4px;min-height:16px"></div></div>`;
+      const render=()=>{
+        $('shoot-grid').innerHTML=all.map((item,i)=>item.shot?`<div style="width:80px;height:34px;border-radius:10px;background:${item.ok?'rgba(46,204,113,.15)':'rgba(192,57,43,.15)'};border:1px solid ${item.ok?'rgba(46,204,113,.3)':'rgba(192,57,43,.3)'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:${item.ok?'#66FFAA':'#FF9999'}">${item.ok?'✅':'💥'}</div>`:`<button style="width:80px;height:34px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(245,240,255,.85);font-size:9.5px;font-weight:700;cursor:pointer;padding:2px" onclick="window._shoot(${i})">${item.t}</button>`).join('');
+      };
+      window._shoot=async(i)=>{if(done||all[i].shot)return;all[i].shot=true;
+        if(all[i].ok){hits++;$('shoot-fb').innerHTML=`<span style="color:#66FFAA">🎯 Đúng!</span>`}
+        else{misses++;$('shoot-fb').innerHTML=`<span style="color:#FF9999">💥 Sai!</span>`}
+        render();
+        const remaining=all.filter(a=>!a.shot&&a.ok).length;
+        if(remaining===0||misses>=3){done=true;const pts=Math.max(0,hits*4-misses*2);
+          setTimeout(()=>{$('shoot-fb').innerHTML=`<span style="color:${pts>8?'#66FFAA':'#FFB0B0'}">${hits}/${r.good.length} từ đúng → +${pts}đ</span>`;afterGame(pts,`${hits} hit, ${misses} miss +${pts}`);},400);}
+      };render();
+    }},
+
+    // ✏️ Điền từ còn thiếu nâng cao
+    fill:{name:'🔤 ĐIỀN TỪ — HOÀN THÀNH CÂU!',run:()=>{
+      const qs=[
+        {t:'"Tất cả quyền lực Nhà nước thuộc về ___"',a:'Nhân dân',opts:['Đảng CSVN','Nhân dân','Quốc hội','Chính phủ']},
+        {t:'Đảng lãnh đạo qua đường lối, ___, kiểm tra, nêu gương',a:'công tác cán bộ',opts:['ban hành lệnh','công tác cán bộ','kiểm soát quân đội','quản lý ngân sách']},
+        {t:'DC XHCN thực hiện qua DC trực tiếp và DC ___',a:'đại diện',opts:['gián tiếp','đại diện','ủy quyền','biểu quyết']},
+        {t:'HP 2013 quy định 4 nguyên tắc bầu cử: phổ thông, bình đẳng, trực tiếp và ___',a:'bỏ phiếu kín',opts:['công khai','bỏ phiếu kín','đa số quyết','toàn dân']},
+        {t:'MTTQ có chức năng: đại diện ND, phản biện XH và ___',a:'giám sát',opts:['điều hành','giám sát','lập pháp','hành pháp']},
+        {t:'Luật Thực hiện DC cơ sở được ban hành năm ___',a:'2022',opts:['2020','2021','2022','2023']},
+      ];
+      let qi=0,score=0;const total=4;const sel=qs.sort(()=>Math.random()-.5).slice(0,total);
+      const render=()=>{
+        if(qi>=total){const pts=score*5;
+          mg.innerHTML=`<div style="text-align:center;padding:14px"><div style="font-size:42px">${score>=3?'🏆':'📝'}</div><div style="font-family:'Dela Gothic One',sans-serif;font-size:20px;color:var(--gold2);margin:8px 0">${score}/${total} đúng</div><div style="color:rgba(245,240,255,.4);font-size:12px">+${pts} điểm</div></div>`;
+          afterGame(pts,`${score}/${total} +${pts}`);return;}
+        const q=sel[qi];const shuffled=[...q.opts].sort(()=>Math.random()-.5);
+        mg.innerHTML=`<div style="padding:4px 0"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:9.5px;color:rgba(212,160,23,.5);font-weight:700">Câu ${qi+1}/${total}</span><span style="font-family:'Dela Gothic One',sans-serif;font-size:12px;color:var(--gold2)">${score} ✓</span></div>
+        <div style="background:linear-gradient(135deg,rgba(212,160,23,.06),rgba(192,57,43,.04));border:1px solid rgba(212,160,23,.15);border-radius:12px;padding:14px;font-size:13px;font-weight:700;color:var(--pp);line-height:1.8;margin-bottom:12px;text-align:center">${q.t.replace('___','<span style="background:rgba(212,160,23,.2);border-bottom:2px solid var(--gold);padding:1px 8px;border-radius:4px">___</span>')}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">${shuffled.map((o,i)=>`<button class="m-ch" onclick="window._fillA('${o.replace(/'/g,'\\\'')}')">${['A','B','C','D'][i]}. ${o}</button>`).join('')}</div>
+        <div id="fill-fb" style="text-align:center;margin-top:8px;font-size:12px;font-weight:700;min-height:18px"></div></div>`;
+        window._fillA=async(ans)=>{const ok=ans===q.a;if(ok)score++;
+          $('fill-fb').innerHTML=ok?`<span style="color:#66FFAA">✅ "${ans}" — Chính xác!</span>`:`<span style="color:#FF9999">❌ Sai! Đáp án: "${q.a}"</span>`;
+          document.querySelectorAll('.m-ch').forEach(b=>{b.classList.add('locked');if(b.textContent.includes(q.a))b.classList.add('correct');else if(b.textContent.includes(ans)&&!ok)b.classList.add('wrong');b.onclick=null});
+          await sleep(900);qi++;render();
+        };
+      };render();
+    }},
+
+    // 🔗 Nối cột nâng cao với animation
+    match:{name:'🔗 NỐI ĐÔI — GHÉP CẶP ĐÚNG!',run:()=>{
       const sets=[
-        {items:['Dân thụ hưởng','Dân biết','Dân bàn','Dân kiểm tra'],correct:[1,2,0,3],hint:'Sắp xếp theo thứ tự 6 quyền DC cơ sở (chọn Dân biết → Dân bàn trước)'},
-        {items:['Nhân dân làm chủ','Đảng lãnh đạo','Nhà nước quản lý','MTTQ giám sát'],correct:[1,2,0,3],hint:'Tam trụ HTCT: Đảng → Nhà nước → Nhân dân'}
+        {title:'Nối quyền DC với ý nghĩa:',pairs:[['Dân biết','Được thông tin công khai'],['Dân bàn','Thảo luận, đề xuất ý kiến'],['Dân kiểm tra','Xem xét việc thực thi'],['Dân thụ hưởng','Nhận lợi ích từ chính sách']]},
+        {title:'Nối cơ quan với chức năng:',pairs:[['Quốc hội','Lập pháp — ban hành luật'],['Chính phủ','Hành pháp — điều hành NN'],['TAND','Tư pháp — xét xử'],['MTTQ','Phản biện & giám sát XH']]},
+        {title:'Nối nguyên tắc bầu cử với giải thích:',pairs:[['Phổ thông','Mọi công dân đủ tuổi đều được bầu'],['Bình đẳng','Mỗi người một phiếu, giá trị ngang nhau'],['Trực tiếp','Cử tri tự đi bầu, không qua đại diện'],['Bỏ phiếu kín','Không ai biết bạn bầu cho ai']]},
       ];
       const set=sets[~~(Math.random()*sets.length)];
-      let sel=[];
-      mg.innerHTML=`<div style="padding:8px 0"><div style="font-size:11px;color:rgba(245,240,255,.5);text-align:center;margin-bottom:10px">${set.hint}</div><div id="ord-items" style="display:flex;flex-direction:column;gap:6px"></div><div id="ord-sel" style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center;margin-top:10px;min-height:32px"></div><div id="ord-fb" style="text-align:center;font-size:12px;font-weight:700;margin-top:8px;min-height:20px"></div></div>`;
+      const N=set.pairs.length;
+      const rightShuffled=[...set.pairs].sort(()=>Math.random()-.5);
+      let selL=null,matched={},mistakes=0;
       const render=()=>{
-        const cont=$('ord-items');cont.innerHTML=set.items.map((it,i)=>`<button class="m-ch" style="${sel.includes(i)?'opacity:.3':'opacity:1'}" onclick="window._ordSel(${i})">${['①','②','③','④'][i]} ${it}</button>`).join('');
-        $('ord-sel').innerHTML=sel.map((i,pos)=>`<div style="background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.3);border-radius:8px;padding:4px 8px;font-size:11px;font-weight:700">${pos+1}. ${set.items[i]}</div>`).join('');
+        const allDone=Object.keys(matched).length===N;
+        mg.innerHTML=`<div style="padding:4px 0"><div style="font-size:11px;font-weight:700;color:rgba(245,240,255,.55);text-align:center;margin-bottom:10px">${set.title}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+          <div style="display:flex;flex-direction:column;gap:5px">${set.pairs.map((pr,i)=>{const done=matched[i]!==undefined;return`<button id="ml${i}" style="padding:8px 7px;border-radius:10px;border:2px solid ${done?'rgba(46,204,113,.5)':selL===i?'rgba(212,160,23,.7)':'rgba(255,255,255,.1)'};background:${done?'rgba(46,204,113,.1)':selL===i?'rgba(212,160,23,.1)':'rgba(255,255,255,.03)'};color:${done?'#66FFAA':selL===i?'var(--gold2)':'rgba(245,240,255,.8)'};font-size:10px;font-weight:700;cursor:${done?'default':'pointer'};text-align:center;transition:all .2s" onclick="window._mL(${i})">${done?'✅ ':selL===i?'▶ ':''}${pr[0]}</button>`}).join('')}</div>
+          <div style="display:flex;flex-direction:column;gap:5px">${rightShuffled.map((pr,i)=>{const matchedLeft=Object.values(matched).includes(i);return`<button id="mr${i}" style="padding:8px 7px;border-radius:10px;border:2px solid ${matchedLeft?'rgba(46,204,113,.5)':'rgba(52,152,219,.25)'};background:${matchedLeft?'rgba(46,204,113,.1)':'rgba(52,152,219,.05)'};color:${matchedLeft?'#66FFAA':'rgba(245,240,255,.65)'};font-size:9.5px;font-weight:600;cursor:${matchedLeft?'default':'pointer'};text-align:center;transition:all .2s" onclick="window._mR(${i})">${pr[1]}</button>`}).join('')}</div>
+        </div>
+        <div id="match-fb" style="text-align:center;margin-top:8px;font-size:11px;font-weight:700;min-height:16px;color:rgba(245,240,255,.4)">Nhấn cột trái → rồi cột phải để nối  ● Lỗi: ${mistakes}</div>
+        ${allDone?`<div style="text-align:center;color:#66FFAA;font-size:12px;font-weight:700;margin-top:4px">🎉 Hoàn thành! +${Math.max(0,(N*5)-mistakes*2)}đ</div>`:''}`;
+        if(allDone){afterGame(Math.max(0,(N*5)-mistakes*2),`nối đúng -${mistakes} lỗi`);}
       };
-      window._ordSel=async(i)=>{if(sel.includes(i))return;sel.push(i);render();
-        if(sel.length===set.items.length){
-          const ok=JSON.stringify(sel)===JSON.stringify(set.correct);
-          $('ord-fb').innerHTML=ok?`<span style="color:#66FFAA">✅ Đúng! +12đ</span>`:`<span style="color:#FF9999">❌ Sai thứ tự!</span>`;
-          if(ok){const np={...s.players[ord[pi]],score:(s.players[ord[pi]].score||0)+12};await apiSaveP(ord[pi],np);floatScore(12,48,55);addLog(`🎮 ${p.emoji} Mini Order: ĐÚNG +12`);}
-          else addLog(`🎮 ${p.emoji} Mini Order: SAI`);
-          $('m-ok').style.display='block';$('m-ok').onclick=async()=>{closeModal();const ns=await getState();await endTurn(ns,isDouble)};
-        }
+      window._mL=i=>{if(matched[i]!==undefined)return;selL=i;render();};
+      window._mR=i=>{if(selL===null)return;const matchedLeft=Object.values(matched).includes(i);if(matchedLeft)return;
+        // Check if right[i] corresponds to left[selL]
+        if(rightShuffled[i][0]===set.pairs[selL][0]){matched[selL]=i;selL=null;render();}
+        else{mistakes++;$('match-fb').innerHTML=`<span style="color:#FF9999">❌ Không khớp! Lỗi: ${mistakes}</span>`;selL=null;render();}
       };render();
     }},
-    fill:{name:'✏️ ĐIỀN TỪ CÒN THIẾU',run:()=>{
-      const qs=[
-        {t:'Điều ___ HP 2013: "Tất cả quyền lực NN thuộc về Nhân dân."',opts:['Điều 1','Điều 2','Điều 4','Điều 6'],a:1},
-        {t:'Nhân dân thực hiện DC qua 2 hình thức: DC ___ và DC đại diện.',opts:['gián tiếp','trực tiếp','nhân dân','cơ sở'],a:1},
-        {t:'Đảng lãnh đạo qua ___, công tác cán bộ, kiểm tra, nêu gương.',opts:['mệnh lệnh','điều lệ','đường lối','ngân sách'],a:2},
-        {t:'6 quyền DC cơ sở: Dân biết, bàn, làm, kiểm tra, ___, thụ hưởng.',opts:['đóng góp','giám sát','bầu cử','quản lý'],a:1},
+
+    // ⚡ Phản xạ chuỗi
+    reflex:{name:'🌊 CHUỖI PHẢN XẠ — GIỮ STREAK!',run:()=>{
+      const questions=[
+        {q:'Đảng CSVN thành lập năm?',a:'1930',opts:['1925','1930','1945','1954']},
+        {q:'HP hiện hành của VN là HP năm?',a:'2013',opts:['1992','2001','2013','2019']},
+        {q:'"Dân biết" là quyền thứ mấy?',a:'1',opts:['1','2','3','6']},
+        {q:'HĐND do ai bầu ra?',a:'Nhân dân địa phương',opts:['Chính phủ','Đảng ủy','Nhân dân địa phương','QH']},
+        {q:'Mô hình tam trụ: Đảng LD - NN QL - Nhân dân ___?',a:'Làm chủ',opts:['Phục vụ','Làm chủ','Giám sát','Đóng góp']},
+        {q:'DC trực tiếp thực hiện qua hình thức nào?',a:'Trưng cầu dân ý',opts:['Họp HĐND','Trưng cầu dân ý','Họp chi bộ','Bầu HĐND']},
       ];
-      const q=qs[~~(Math.random()*qs.length)];let done=false;
-      mg.innerHTML=`<div style="padding:8px 0"><div style="font-size:13px;font-weight:700;color:var(--pp);text-align:center;margin-bottom:14px;line-height:1.6">${q.t}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${q.opts.map((o,i)=>`<button class="m-ch" onclick="window._fillAns(${i})">${['A','B','C','D'][i]}. ${o}</button>`).join('')}</div><div id="fill-fb" style="text-align:center;margin-top:10px;font-size:13px;font-weight:700;min-height:20px"></div></div>`;
-      window._fillAns=async(i)=>{if(done)return;done=true;
-        const ok=i===q.a;
-        $('fill-fb').innerHTML=ok?`<span style="color:#66FFAA">✅ Chính xác! +10đ</span>`:`<span style="color:#FF9999">❌ Sai! Đáp án: ${q.opts[q.a]}</span>`;
-        document.querySelectorAll('.m-ch').forEach((b,j)=>{b.classList.add('locked');if(j===q.a)b.classList.add('correct');else if(j===i)b.classList.add('wrong');b.onclick=null});
-        if(ok){const np={...s.players[ord[pi]],score:(s.players[ord[pi]].score||0)+10};await apiSaveP(ord[pi],np);floatScore(10,48,55);addLog(`🎮 ${p.emoji} Mini Fill: ĐÚNG +10`);}
-        else addLog(`🎮 ${p.emoji} Mini Fill: SAI`);
-        $('m-ok').style.display='block';$('m-ok').onclick=async()=>{closeModal();const ns=await getState();await endTurn(ns,isDouble)};
-      };
-    }},
-    match:{name:'🔗 NỐI CỘT',run:()=>{
-      const pairs=[['Dân biết','Thông tin, công khai'],['Dân bàn','Thảo luận, quyết định'],['Dân kiểm tra','Xem xét thực hiện'],['Dân thụ hưởng','Lợi ích, kết quả']];
-      const shuffled=[...pairs].sort(()=>Math.random()-.5);
-      let selL=null,matches={},done=false;
+      let streak=0,maxStreak=0,qi=0;const total=6;const q=questions.sort(()=>Math.random()-.5).slice(0,total);
+      let timeLeft=8,timer2=null;
       const render=()=>{
-        mg.innerHTML=`<div style="padding:6px 0"><div style="font-size:11px;color:rgba(245,240,255,.5);text-align:center;margin-bottom:8px">Chọn cột trái → cột phải để nối</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${shuffled.map((p,i)=>`<button id="ml${i}" style="padding:8px 6px;border-radius:9px;border:1px solid rgba(212,160,23,.2);background:${matches[i]!==undefined?'rgba(46,204,113,.12)':'rgba(255,255,255,.04)'};color:rgba(245,240,255,.8);font-size:10px;font-weight:700;cursor:pointer;text-align:center" onclick="window._matchL(${i})">${selL===i?'▶ ':''}${p[0]}</button><button id="mr${i}" style="padding:8px 6px;border-radius:9px;border:1px solid rgba(52,152,219,.2);background:rgba(255,255,255,.04);color:rgba(245,240,255,.7);font-size:10px;font-weight:700;cursor:pointer" onclick="window._matchR(${i})">${p[1]}</button>`).join('')}</div><div id="match-fb" style="text-align:center;margin-top:8px;font-size:12px;font-weight:700;min-height:18px"></div></div>`;
+        if(qi>=total){const pts=maxStreak*4;
+          mg.innerHTML=`<div style="text-align:center;padding:14px"><div style="font-size:42px">${maxStreak>=5?'🔥':maxStreak>=3?'⚡':'💫'}</div><div style="font-family:'Dela Gothic One',sans-serif;font-size:18px;color:var(--gold2)">Streak cao nhất: ${maxStreak}</div><div style="font-size:12px;color:rgba(245,240,255,.4);margin-top:4px">+${pts} điểm</div></div>`;
+          afterGame(pts,`streak ${maxStreak} +${pts}`);return;}
+        const cur=q[qi];timeLeft=8;
+        mg.innerHTML=`<div style="padding:4px 0">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div style="font-size:10px;font-weight:700;color:rgba(245,240,255,.4)">Câu ${qi+1}/${total}</div>
+            <div style="display:flex;gap:2px">${Array.from({length:6},(_,i)=>i<qi?`<span style="color:${q[i]._ok?'#66FFAA':'#FF9999'};font-size:11px">${q[i]._ok?'✅':'❌'}</span>`:`<span style="font-size:11px;color:rgba(255,255,255,.2)">○</span>`).join('')}</div>
+            <div id="ref-timer" style="font-family:'Dela Gothic One',sans-serif;font-size:16px;color:var(--gold2)">⏱${timeLeft}</div>
+          </div>
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:12px;font-size:13px;font-weight:700;color:var(--pp);text-align:center;margin-bottom:10px;line-height:1.5">${cur.q}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${cur.opts.map((o,i)=>`<button class="m-ch" style="padding:10px 6px;justify-content:center;text-align:center" onclick="window._refQ('${o.replace(/'/g,'\\\'')}')">${o}</button>`).join('')}</div>
+          <div id="ref2-fb" style="text-align:center;margin-top:6px;font-size:11px;font-weight:700;min-height:16px"></div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:6px;justify-content:center">
+            <span style="font-size:10px;color:rgba(245,240,255,.35)">Streak:</span>
+            ${Array.from({length:6},(_,i)=>`<div style="width:10px;height:10px;border-radius:50%;background:${i<streak?'#FF8800':'rgba(255,255,255,.1)'};box-shadow:${i<streak?'0 0 6px rgba(255,136,0,.6)':'none'}"></div>`).join('')}
+            <span style="font-family:'Dela Gothic One',sans-serif;font-size:13px;color:#FF8800">${streak>0?'🔥'.repeat(Math.min(streak,5)):''}</span>
+          </div></div>`;
+        clearInterval(timer2);
+        timer2=setInterval(()=>{timeLeft--;const el=$('ref-timer');if(el)el.textContent=`⏱${timeLeft}`;if(timeLeft<=0){clearInterval(timer2);cur._ok=false;streak=0;$('ref2-fb').innerHTML=`<span style="color:#FF9999">⏰ Hết giờ!</span>`;document.querySelectorAll('.m-ch').forEach(b=>{b.classList.add('locked');if(b.textContent===cur.a)b.classList.add('correct');b.onclick=null});setTimeout(()=>{qi++;render();},800);}},1000);
       };
-      window._matchL=i=>{if(done||matches[i]!==undefined)return;selL=i;render();};
-      window._matchR=async i=>{if(done||selL===null)return;
-        if(i===selL){matches[selL]=i;selL=null;render();
-          if(Object.keys(matches).length===shuffled.length){done=true;
-            $('match-fb').innerHTML=`<span style="color:#66FFAA">✅ Nối đúng tất cả! +14đ</span>`;
-            const np={...s.players[ord[pi]],score:(s.players[ord[pi]].score||0)+14};await apiSaveP(ord[pi],np);floatScore(14,48,55);addLog(`🎮 ${p.emoji} Mini Match: ĐÚNG +14`);
-            $('m-ok').style.display='block';$('m-ok').onclick=async()=>{closeModal();const ns=await getState();await endTurn(ns,isDouble)};
-          }
-        } else {selL=null;$('#match-fb')?null:null;render();}
+      window._refQ=async(ans)=>{clearInterval(timer2);const cur=q[qi];const ok=ans===cur.a;cur._ok=ok;
+        if(ok){streak++;maxStreak=Math.max(maxStreak,streak);$('ref2-fb').innerHTML=`<span style="color:#66FFAA">✅ ĐÚNG! ${streak>=3?'🔥 STREAK x'+streak:''}</span>`}
+        else{streak=0;$('ref2-fb').innerHTML=`<span style="color:#FF9999">❌ Sai! Đáp án: "${cur.a}"</span>`}
+        document.querySelectorAll('.m-ch').forEach(b=>{b.classList.add('locked');if(b.textContent===cur.a)b.classList.add('correct');else if(b.textContent===ans&&!ok)b.classList.add('wrong');b.onclick=null});
+        await sleep(850);qi++;render();
       };render();
     }},
-    reflex:{name:'⚡ PHẢN XẠ NHANH',run:()=>{
-      const words=['Nhân dân','Đảng CSVN','Hiến pháp','Dân chủ','MTTQ','Pháp luật'];
-      const bad=['Độc tài','Tư bản','Vô chính phủ','Bóc lột'];
-      let score=0,lives=3,active=true,timer=null;
-      mg.innerHTML=`<div style="padding:6px 0;text-align:center"><div style="font-size:11px;color:rgba(245,240,255,.5);margin-bottom:8px">Nhấn ✅ nếu ĐÚNG với DC XHCN · ❌ nếu SAI — 8 từ!</div><div style="display:flex;justify-content:center;gap:16px;margin-bottom:10px"><span id="ref-score" style="font-family:'Dela Gothic One',sans-serif;font-size:18px;color:var(--gold2)">0</span><span id="ref-lives" style="font-size:16px">❤️❤️❤️</span></div><div id="ref-word" style="font-family:'Dela Gothic One',sans-serif;font-size:20px;color:var(--pp);margin:12px 0;min-height:32px;text-align:center">Sẵn sàng?</div><div id="ref-bar" style="height:4px;background:var(--gold);border-radius:2px;width:100%;transition:width .1s"></div><div style="display:flex;gap:10px;margin-top:12px;justify-content:center"><button onclick="window._refAns(true)" style="flex:1;padding:14px;border-radius:12px;background:rgba(46,204,113,.12);border:2px solid rgba(46,204,113,.5);color:#80FFB0;font-family:'Dela Gothic One',sans-serif;font-size:20px;cursor:pointer">✅</button><button onclick="window._refAns(false)" style="flex:1;padding:14px;border-radius:12px;background:rgba(192,57,43,.12);border:2px solid rgba(192,57,43,.5);color:#FFB0B0;font-family:'Dela Gothic One',sans-serif;font-size:20px;cursor:pointer">❌</button></div></div>`;
-      const all=[...words.map(w=>({w,ok:true})),...bad.map(w=>({w,ok:false}))].sort(()=>Math.random()-.5).slice(0,8);
-      let qi=0;
-      const next=()=>{if(qi>=all.length||!active){finish();return;}
-        const q=all[qi];$('ref-word').textContent=q.w;
-        let t=3000;const t0=Date.now();clearInterval(timer);
-        timer=setInterval(()=>{const left=Math.max(0,1-(Date.now()-t0)/t);$('ref-bar').style.width=(left*100)+'%';if(left===0){clearInterval(timer);if(active){lives--;$('ref-lives').textContent='❤️'.repeat(Math.max(0,lives));if(lives<=0){finish();}else{qi++;next();}}}},50);
-      };
-      window._refAns=async(ans)=>{if(!active)return;clearInterval(timer);const q=all[qi];const ok=ans===q.ok;
-        if(ok){score++;$('ref-score').textContent=score;}else{lives--;$('ref-lives').textContent='❤️'.repeat(Math.max(0,lives));}
-        qi++;if(lives<=0||qi>=all.length){finish();}else next();
-      };
-      const finish=async()=>{active=false;clearInterval(timer);const pts=score*3;
-        $('ref-word').innerHTML=`<span style="color:${pts>10?'#66FFAA':'#FFB0B0'}">Xong! ${score}/${all.length} đúng → +${pts}đ</span>`;
-        if(pts>0){const np={...s.players[ord[pi]],score:(s.players[ord[pi]].score||0)+pts};await apiSaveP(ord[pi],np);floatScore(pts,48,55);}
-        addLog(`🎮 ${p.emoji} Mini Reflex: ${score}/${all.length} +${pts}`);
-        $('m-ok').style.display='block';$('m-ok').onclick=async()=>{closeModal();const ns=await getState();await endTurn(ns,isDouble)};
-      };
-      setTimeout(next,600);
-    }},
-    quiz:{name:'🏆 THÁCH THỨC NHANH',run:()=>{
+
+    // 🏆 Đấu trí nhanh - boss round
+    quiz:{name:'👑 BOSS ROUND — ĐẤU TRÍ CUỐI!',run:()=>{
       const qs=[
-        {t:'HP 2013 có bao nhiêu chương?',opts:['9 chương','10 chương','11 chương','12 chương'],a:2},
-        {t:'Luật THDC cơ sở năm nào?',opts:['2020','2021','2022','2023'],a:2},
-        {t:'HĐND do ai bầu ra?',opts:['Chính phủ','Nhân dân địa phương','Đảng ủy cùng cấp','UBND cấp trên'],a:1},
-        {t:'DC trực tiếp thể hiện qua hình thức nào?',opts:['Bầu cử, trưng cầu dân ý','Chỉ qua đại biểu QH','Chỉ qua HĐND','Chỉ qua MTTQ'],a:0},
+        {t:'HP 2013 có bao nhiêu điều khoản?',opts:['100 điều','120 điều','130 điều','178 điều'],a:1,pts:15},
+        {t:'Luật THDC cơ sở 2022 quy định bao nhiêu quyền DC?',opts:['4 quyền','5 quyền','6 quyền','7 quyền'],a:2,pts:15},
+        {t:'DC XHCN khác DC TS cơ bản ở điểm nào?',opts:['Có đa đảng','Bảo vệ đa số ND lao động, xóa bỏ bóc lột','Có tam quyền phân lập','Kinh tế thị trường tự do'],a:1,pts:20},
+        {t:'Phương thức Đảng lãnh đạo KHÔNG bao gồm?',opts:['Đường lối, chủ trương','Công tác cán bộ','Ra mệnh lệnh hành chính trực tiếp','Nêu gương đảng viên'],a:2,pts:20},
+        {t:'Quyền "Dân giám sát" khác "Dân kiểm tra" thế nào?',opts:['Hoàn toàn giống nhau','Kiểm tra: xem xét cụ thể; Giám sát: theo dõi thường xuyên, toàn diện','Giám sát chỉ do MTTQ thực hiện','Kiểm tra quan trọng hơn'],a:1,pts:25},
       ];
-      const q=qs[~~(Math.random()*qs.length)];let done=false;
-      let timeLeft=15;let timerRef=setInterval(()=>{timeLeft--;const el=$('quiz-timer');if(el)el.textContent=`⏱ ${timeLeft}s`;if(timeLeft<=0){clearInterval(timerRef);if(!done){done=true;$('quiz-fb').innerHTML=`<span style="color:#FF9999">⏰ Hết giờ! Đáp án: ${q.opts[q.a]}</span>`;addLog(`🎮 ${p.emoji} Mini Quiz: Hết giờ`);$('m-ok').style.display='block';$('m-ok').onclick=async()=>{closeModal();const ns=await getState();await endTurn(ns,isDouble)};}}},1000);
-      mg.innerHTML=`<div style="padding:8px 0"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-size:11px;color:rgba(212,160,23,.6);font-weight:700">🏆 Quiz Nhanh</div><div id="quiz-timer" style="font-size:12px;font-weight:700;color:var(--gold2)">⏱ 15s</div></div><div style="font-size:13px;font-weight:700;color:var(--pp);text-align:center;margin-bottom:14px;line-height:1.5">${q.t}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${q.opts.map((o,i)=>`<button class="m-ch" onclick="window._quizAns(${i})">${['A','B','C','D'][i]}. ${o}</button>`).join('')}</div><div id="quiz-fb" style="text-align:center;margin-top:10px;font-size:13px;font-weight:700;min-height:20px"></div></div>`;
-      window._quizAns=async(i)=>{if(done)return;done=true;clearInterval(timerRef);
-        const ok=i===q.a;
-        $('quiz-fb').innerHTML=ok?`<span style="color:#66FFAA">✅ Đúng! +15đ</span>`:`<span style="color:#FF9999">❌ Sai! Đáp án: ${q.opts[q.a]}</span>`;
-        document.querySelectorAll('.m-ch').forEach((b,j)=>{b.classList.add('locked');if(j===q.a)b.classList.add('correct');else if(j===i)b.classList.add('wrong');b.onclick=null});
-        if(ok){const np={...s.players[ord[pi]],score:(s.players[ord[pi]].score||0)+15};await apiSaveP(ord[pi],np);floatScore(15,48,55);addLog(`🎮 ${p.emoji} Mini Quiz: ĐÚNG +15`);}
-        else addLog(`🎮 ${p.emoji} Mini Quiz: SAI`);
-        $('m-ok').style.display='block';$('m-ok').onclick=async()=>{closeModal();const ns=await getState();await endTurn(ns,isDouble)};
+      let qi=0,totalPts=0,streak=0;const q=qs.sort(()=>Math.random()-.5).slice(0,3);
+      let timeLimit=20,timer3=null;
+      const render=()=>{
+        if(qi>=q.length){
+          mg.innerHTML=`<div style="text-align:center;padding:14px"><div style="font-size:52px">${totalPts>=50?'👑':totalPts>=30?'🏆':'🥈'}</div><div style="font-family:'Dela Gothic One',sans-serif;font-size:24px;color:var(--gold2);margin:8px 0">+${totalPts} ĐIỂM</div><div style="font-size:11px;color:rgba(245,240,255,.4)">${q.length} câu — Boss Round Complete!</div></div>`;
+          afterGame(totalPts,`Boss +${totalPts}`);return;}
+        const cur=q[qi];timeLimit=20+qi*5;let tl=timeLimit;
+        mg.innerHTML=`<div style="padding:4px 0">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.25);border-radius:20px;padding:3px 10px;font-size:9px;font-weight:700;color:var(--gold2)">Câu ${qi+1}/${q.length} · +${cur.pts}đ</div>
+            <div id="boss-timer" style="font-family:'Dela Gothic One',sans-serif;font-size:18px;color:${tl<=5?'#FF6666':'var(--gold2)'}">⏱ ${tl}s</div>
+          </div>
+          <div id="boss-tbar" style="height:4px;background:linear-gradient(90deg,var(--red2),var(--gold2));border-radius:2px;width:100%;margin-bottom:12px;transition:width .1s"></div>
+          <div style="background:linear-gradient(135deg,rgba(30,10,60,.6),rgba(10,4,20,.8));border:1px solid rgba(155,89,182,.25);border-radius:14px;padding:14px;font-size:13px;font-weight:700;color:var(--pp);text-align:center;line-height:1.55;margin-bottom:12px">${cur.t}</div>
+          <div style="display:flex;flex-direction:column;gap:7px">${cur.opts.map((o,i)=>`<button class="m-ch" onclick="window._bossAns(${i})"><span class="ch-ltr">${['A','B','C','D'][i]}</span><span>${o}</span></button>`).join('')}</div>
+          <div id="boss-fb" style="text-align:center;margin-top:8px;font-size:12px;font-weight:700;min-height:18px"></div></div>`;
+        clearInterval(timer3);
+        timer3=setInterval(()=>{tl--;const pct=(tl/timeLimit*100).toFixed(1);const bt=$('boss-tbar');if(bt)bt.style.width=pct+'%';const tt=$('boss-timer');if(tt){tt.textContent=`⏱ ${tl}s`;tt.style.color=tl<=5?'#FF6666':'var(--gold2)';}
+          if(tl<=0){clearInterval(timer3);$('boss-fb').innerHTML=`<span style="color:#FF9999">⏰ Hết giờ!</span>`;document.querySelectorAll('.m-ch').forEach(b=>{b.classList.add('locked');if(b.textContent.includes(cur.opts[cur.a]))b.classList.add('correct');b.onclick=null});setTimeout(()=>{qi++;render();},1000);}
+        },1000);
       };
+      window._bossAns=async(i)=>{clearInterval(timer3);const cur=q[qi];const ok=i===cur.a;
+        if(ok){const bonus=Math.round(timeLimit>10?cur.pts*1.2:cur.pts);totalPts+=bonus;$('boss-fb').innerHTML=`<span style="color:#66FFAA">✅ ĐÚNG! +${bonus}đ 🔥</span>`}
+        else{$('boss-fb').innerHTML=`<span style="color:#FF9999">❌ Sai! Đáp án: ${cur.opts[cur.a]}</span>`}
+        document.querySelectorAll('.m-ch').forEach(b=>{b.classList.add('locked');if(b.textContent.includes(cur.opts[cur.a]))b.classList.add('correct');else if(b.textContent.includes(cur.opts[i])&&!ok)b.classList.add('wrong');b.onclick=null});
+        await sleep(1100);qi++;render();
+      };render();
     }},
   };
+
   const game=GAMES[mtype]||GAMES.tf;
   openModal({badge:'mb-info',bt:`🎮 Mini Game — ${p.emoji} ${p.name}`,title:game.name,body:'',hideOk:true});
   mg.style.display='block';
+  $('m-ok').style.display='none';
   game.run();
 }
 
@@ -910,6 +1006,6 @@ function confetti(){const c=['#C0392B','#D4A017','#F1C40F','#27AE60','#3498DB','
 const getState=async()=>{const r=await get_('get',{code:myRoom});if(r.ok)G=r.state;return G};
 const apiSaveP=(pid,data)=>post('updatePlayer',{code:myRoom,pid,data}).then(r=>{if(r.ok)G=r.state});
 const apiPatch=patch=>post('update',{code:myRoom,patch}).then(r=>{if(r.ok)G=r.state});
-window.addEventListener('resize',()=>{const b=$('board');if(!b||!$('s-admin').classList.contains('active'))return;const sz=Math.min(window.innerWidth-340,window.innerHeight-56,700);b.style.width=b.style.height=Math.max(280,sz)+'px'});
+window.addEventListener('resize',()=>{const b=$('board');if(!b||!$('s-admin').classList.contains('active'))return;const avW=window.innerWidth-280;const avH=window.innerHeight-52;const sz=Math.max(300,Math.min(avW,avH,820));b.style.width=b.style.height=sz+'px'});
 </script>
 </body></html>
