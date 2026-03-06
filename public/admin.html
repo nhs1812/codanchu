@@ -1,0 +1,674 @@
+<!DOCTYPE html><html lang="vi"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Admin — Cờ Dân Chủ</title>
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Be+Vietnam+Pro:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--red:#C0392B;--red2:#E74C3C;--rg:rgba(192,57,43,.4);--gold:#D4A017;--gold2:#F1C40F;--gg:rgba(212,160,23,.35);--ink:#07040A;--ink2:#110D18;--pp:#F5F0FF;--gr:#1A5C2A;--gr2:#2ECC71;--bl:#1A3A6A;--bl2:#3498DB;--pu:#4A1478;--pu2:#9B59B6;--or:#7A3000;--or2:#E67E22;--cy:#006655;--cy2:#1ABC9C}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--ink);font-family:'Be Vietnam Pro',sans-serif;color:var(--pp)}
+button{cursor:pointer;font-family:inherit;border:none;outline:none}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(212,160,23,.2);border-radius:2px}
+.screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center}
+.screen.active{display:flex}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes orbSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes orbSpinR{from{transform:rotate(0)}to{transform:rotate(-360deg)}}
+@keyframes floatUp{0%{transform:translateY(0) scale(.8);opacity:0}15%{opacity:1;transform:translateY(-20px) scale(1.3)}80%{opacity:.9}100%{transform:translateY(-90px) scale(.9);opacity:0}}
+@keyframes dieRoll{0%{transform:rotateX(0) rotateY(0)}25%{transform:rotateX(90deg) rotateY(45deg) scale(1.3)}50%{transform:rotateX(180deg) rotateY(90deg) scale(.85)}75%{transform:rotateX(270deg) rotateY(135deg) scale(1.2)}100%{transform:rotateX(360deg) rotateY(180deg)}}
+@keyframes dblFlash{0%,100%{box-shadow:3px 3px 0 rgba(0,0,0,.5)}50%{box-shadow:0 0 30px rgba(212,160,23,1),0 0 60px rgba(192,57,43,.8)}}
+@keyframes hlCell{0%{box-shadow:inset 0 0 0 3px white,0 0 40px rgba(241,196,15,.9)}100%{box-shadow:none}}
+@keyframes jailBarAnim{0%,100%{opacity:.4}50%{opacity:.8}}
+@keyframes confettiFall{to{transform:translateY(105vh) rotate(800deg);opacity:0}}
+@keyframes slideUp{0%{transform:translateY(60px);opacity:0}100%{transform:translateY(0);opacity:1}}
+@keyframes onPing{0%,100%{box-shadow:0 0 0 0 rgba(46,204,113,.55)}70%{box-shadow:0 0 0 7px rgba(46,204,113,0)}}
+@keyframes escapeFlash{0%,100%{background:rgba(155,89,182,.1)}50%{background:rgba(155,89,182,.3)}}
+@keyframes flagWave{0%{d:path("M0,0 Q30,5 60,0 Q90,-5 120,0 L120,80 Q90,85 60,80 Q30,75 0,80 Z")}50%{d:path("M0,0 Q30,8 60,-3 Q90,-10 120,0 L120,80 Q90,90 60,77 Q30,70 0,80 Z")}100%{d:path("M0,0 Q30,5 60,0 Q90,-5 120,0 L120,80 Q90,85 60,80 Q30,75 0,80 Z")}}
+@keyframes starGlow{0%,100%{filter:drop-shadow(0 0 4px rgba(255,220,0,.9))}50%{filter:drop-shadow(0 0 14px rgba(255,220,0,1))}}
+.vn-flag-wrap{display:inline-flex;align-items:flex-start}
+.vn-pole{background:linear-gradient(180deg,#FFE066,#9A7000 40%,#FFE066 80%,#9A7000);border-radius:2px;box-shadow:2px 0 6px rgba(0,0,0,.6)}
+.vn-flag-svg{display:block;overflow:visible}
+.vn-flag-body{animation:flagWave 2.2s ease-in-out infinite;transform-origin:left center}
+.vn-star{fill:#FFE033;animation:starGlow 2.5s ease-in-out infinite}
+/* LOGIN */
+#s-login{background:radial-gradient(ellipse 200% 100% at 50% -10%,rgba(192,57,43,.18),transparent 55%),var(--ink);padding:20px}
+.lbox{max-width:380px;width:100%;text-align:center}
+.ltitle{font-family:'Dela Gothic One',sans-serif;font-size:clamp(36px,10vw,64px);background:linear-gradient(145deg,#FFF9C4,#F1C40F 35%,#D4A017 55%,#E74C3C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
+.lsub{font-size:11px;font-weight:700;color:rgba(245,240,255,.35);letter-spacing:2px;margin-bottom:20px}
+.card{background:linear-gradient(155deg,rgba(20,12,30,.98),rgba(10,5,18,.99));border:1px solid rgba(212,160,23,.15);border-radius:18px;padding:20px 18px;box-shadow:0 30px 80px rgba(0,0,0,.9);position:relative;overflow:hidden;margin-bottom:12px}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(212,160,23,.6),rgba(192,57,43,.5),rgba(212,160,23,.6),transparent)}
+.lbl{font-size:8.5px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(212,160,23,.38);margin-bottom:8px}
+.inp{width:100%;padding:13px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(212,160,23,.12);border-radius:11px;color:var(--pp);font-family:'Be Vietnam Pro',sans-serif;font-size:15px;font-weight:700;outline:none;transition:border-color .2s;margin-bottom:12px;-webkit-appearance:none}
+.inp:focus{border-color:rgba(212,160,23,.38)}
+.btn-main{width:100%;padding:15px;border-radius:12px;background:linear-gradient(135deg,var(--red2),var(--red));color:var(--gold2);font-family:'Dela Gothic One',sans-serif;font-size:16px;letter-spacing:2px;box-shadow:0 8px 30px var(--rg);transition:all .28s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px}
+.btn-main:hover{transform:translateY(-2px)}
+.btn-main:disabled{opacity:.3;cursor:not-allowed;transform:none}
+.btn-sec{width:100%;padding:12px;border-radius:11px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:rgba(245,240,255,.45);font-size:12px;font-weight:700;letter-spacing:.5px;transition:all .2s}
+.btn-sec:hover{background:rgba(255,255,255,.07);color:rgba(245,240,255,.65)}
+.err{color:#FF8080;font-size:11px;font-weight:700;text-align:center;margin-bottom:10px;min-height:18px}
+/* LOBBY */
+.plcode{font-family:'Dela Gothic One',sans-serif;font-size:54px;letter-spacing:12px;background:linear-gradient(135deg,#FFF9C4,#F1C40F);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 22px rgba(212,160,23,.6));text-align:center}
+.join-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin:10px 0}
+.join-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:10px 8px;text-align:center}
+.rnd-sel{display:flex;gap:6px;justify-content:center;margin-bottom:12px;flex-wrap:wrap}
+.rnd-btn{flex:1;min-width:38px;padding:10px 4px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:rgba(245,240,255,.55);font-family:'Dela Gothic One',sans-serif;font-size:15px;transition:all .2s}
+.rnd-btn.active{background:linear-gradient(135deg,var(--red2),var(--red));color:var(--gold2);border-color:transparent;box-shadow:0 4px 16px var(--rg)}
+.pc-sel{display:flex;gap:6px;justify-content:center;margin-bottom:14px;flex-wrap:wrap}
+.pc-btn{flex:1;min-width:32px;padding:9px 4px;border-radius:9px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:rgba(245,240,255,.45);font-family:'Dela Gothic One',sans-serif;font-size:13px;transition:all .2s}
+.pc-btn.active{background:linear-gradient(135deg,#1A3A6A,#0D2040);color:var(--gold2);border-color:rgba(52,152,219,.4)}
+/* HUD */
+.hud{height:46px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:rgba(10,5,16,.98);border-bottom:1.5px solid rgba(212,160,23,.12);z-index:20}
+.hud-brand{font-family:'Dela Gothic One',sans-serif;font-size:13px;background:linear-gradient(90deg,#F1C40F,#E74C3C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hud-pill{padding:3px 10px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.5px}
+.pill-red{background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.3);color:var(--red2)}
+.hud-pip{width:7px;height:7px;border-radius:50%;border:2px solid rgba(212,160,23,.2);transition:all .35s}
+.hud-pip.done{background:var(--gold);border-color:var(--gold)}
+.hud-pip.now{background:var(--red2);border-color:var(--red2);box-shadow:0 0 8px var(--rg);animation:pulse 1.3s infinite}
+/* ADMIN GAME */
+#s-admin{background:var(--ink);flex-direction:column;overflow:hidden}
+.admin-body{flex:1;display:grid;grid-template-columns:160px 1fr 160px;gap:5px;padding:5px;overflow:hidden;min-height:0}
+.aside{display:flex;flex-direction:column;gap:5px;overflow:hidden;min-height:0}
+.aside-card{background:rgba(15,9,24,.98);border:1px solid rgba(212,160,23,.1);border-radius:12px;padding:10px;position:relative;overflow:hidden;flex-shrink:0}
+.aside-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(212,160,23,.25),transparent)}
+.aside-hd{font-size:7.5px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(212,160,23,.32);margin-bottom:8px}
+.log-box{background:rgba(212,160,23,.03);border:1px solid rgba(212,160,23,.08);border-radius:8px;padding:8px;font-size:9.5px;color:rgba(245,240,255,.6);line-height:1.85;flex:1;overflow-y:auto;min-height:0}
+.sc-row{display:flex;align-items:center;gap:5px;padding:5px 6px;border-radius:8px;margin-bottom:2px;transition:all .3s;border:1px solid transparent;position:relative}
+.sc-row.cur{background:rgba(212,160,23,.07);border-color:rgba(212,160,23,.18)}
+.sc-row.jailed{opacity:.5}
+.sc-av{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;border:2px solid;box-shadow:0 2px 10px rgba(0,0,0,.6)}
+.sc-name{font-size:9.5px;font-weight:700;color:var(--pp);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:68px}
+.sc-pts{font-family:'Dela Gothic One',sans-serif;font-size:13px;flex-shrink:0}
+.sc-bar-w{width:100%;height:2.5px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:2px}
+.sc-bar{height:100%;border-radius:2px;transition:width .7s cubic-bezier(.34,1.56,.64,1)}
+.sc-jail-badge{font-size:6.5px;color:#CC88FF;background:rgba(74,20,120,.2);border:1px solid rgba(155,89,182,.3);padding:1px 4px;border-radius:4px}
+.ctrl-btn{width:100%;padding:9px;border-radius:9px;font-family:'Be Vietnam Pro',sans-serif;font-size:10px;font-weight:700;cursor:pointer;transition:all .22s;display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:5px}
+.ctrl-roll{background:linear-gradient(135deg,var(--red2),var(--red));color:var(--gold2);box-shadow:0 4px 16px var(--rg)}
+.ctrl-roll:hover:not(:disabled){transform:translateY(-2px)}
+.ctrl-roll:disabled{opacity:.2;cursor:not-allowed;transform:none}
+.ctrl-ghost{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);color:rgba(245,240,255,.4)}
+/* BOARD */
+.board-wrap{position:relative;display:flex;align-items:center;justify-content:center}
+.board{position:relative}
+.board::before{content:'';position:absolute;inset:0;border-radius:6px;z-index:1;pointer-events:none;box-shadow:inset 0 0 0 2px rgba(212,160,23,.2),0 50px 140px rgba(0,0,0,.97);background:linear-gradient(160deg,rgba(255,255,255,.02) 0%,transparent 35%)}
+.board-grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(11,1fr);grid-template-rows:repeat(11,1fr)}
+.cell{position:relative;border:1px solid rgba(212,160,23,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;background:rgba(12,7,20,.93);padding:1px}
+.cell::after{content:'';position:absolute;inset:0;opacity:0;background:radial-gradient(circle at center,rgba(212,160,23,.3),transparent 70%);transition:opacity .25s;pointer-events:none}
+.cell:hover::after{opacity:1}
+.cell.hl{animation:hlCell .5s ease}
+.cband{position:absolute;border-radius:1px}
+.cell.bot .cband{bottom:0;left:0;right:0;height:21%}
+.cell.top .cband{top:0;left:0;right:0;height:21%}
+.cell.lft .cband{right:0;top:0;bottom:0;width:21%}
+.cell.rgt .cband{left:0;top:0;bottom:0;width:21%}
+.band-r{background:linear-gradient(var(--red2),var(--red))}.band-g{background:linear-gradient(#A07810,var(--gold2))}.band-gr{background:linear-gradient(var(--gr),var(--gr2))}.band-bl{background:linear-gradient(var(--bl),var(--bl2))}.band-pu{background:linear-gradient(var(--pu),var(--pu2))}.band-or{background:linear-gradient(var(--or),var(--or2))}.band-cy{background:linear-gradient(var(--cy),var(--cy2))}
+.c-icon{font-size:clamp(7px,1.3vw,14px);line-height:1;margin-bottom:1px;position:relative;z-index:2}
+.c-name{font-size:clamp(3.5px,.55vw,6px);font-weight:700;color:rgba(245,240,255,.82);text-align:center;line-height:1.2;padding:0 1px;max-height:2.8em;overflow:hidden;position:relative;z-index:2}
+.cell-start{background:linear-gradient(135deg,rgba(100,0,0,.5),rgba(192,57,43,.3))!important;border:2px solid rgba(192,57,43,.55)!important}
+.cell-reform{background:linear-gradient(135deg,rgba(74,20,120,.55),rgba(30,0,60,.45))!important;border:2px solid rgba(155,89,182,.5)!important}
+.cell-park{background:linear-gradient(135deg,rgba(26,92,42,.4),rgba(10,50,25,.35))!important;border:2px solid rgba(46,204,113,.4)!important}
+.cell-go-jail{background:linear-gradient(135deg,rgba(74,20,120,.35),rgba(192,57,43,.3))!important;border:2px solid rgba(155,89,182,.4)!important}
+.cell-lucky{background:rgba(160,120,16,.12)!important;border:1px solid rgba(212,160,23,.32)!important}
+.cell-duel{background:rgba(30,80,150,.1)!important;border:1px solid rgba(52,152,219,.28)!important}
+.cell-q{background:rgba(212,160,23,.05)!important}
+.cell-nq{background:rgba(0,50,15,.25)!important}
+.cell-dn{background:rgba(50,24,0,.22)!important}
+.cell-tax{background:rgba(74,20,120,.12)!important}
+.cell-bon{background:rgba(26,92,42,.14)!important}
+.cell-mini{background:rgba(30,80,150,.09)!important;border-color:rgba(52,152,219,.2)!important}
+.jail-bars{position:absolute;inset:0;display:flex;gap:2px;align-items:center;justify-content:center;pointer-events:none;z-index:1}
+.jail-bar{width:2px;border-radius:1px;background:rgba(155,89,182,.6);animation:jailBarAnim 2.2s ease-in-out infinite}
+.cell-tokens{position:absolute;bottom:1px;right:1px;display:flex;flex-wrap:wrap;gap:1px;z-index:4;max-width:85%;pointer-events:none}
+.token-dot{border-radius:2px;padding:1px;font-size:clamp(5px,.75vw,9px);line-height:1}
+/* BOARD CENTER */
+.bcenter{position:absolute;top:calc(100%/11);left:calc(100%/11);right:calc(100%/11);bottom:calc(100%/11);display:flex;flex-direction:column;align-items:center;justify-content:space-between;background:radial-gradient(ellipse,rgba(28,10,50,.97),rgba(7,4,11,.99));border:1px solid rgba(212,160,23,.1);border-radius:4px;overflow:hidden;padding:4px 3px}
+.bc-top{display:flex;flex-direction:column;align-items:center;gap:2px;width:100%}
+.bc-flag-row{display:flex;justify-content:center}
+.orbit-wrap{position:relative;flex-shrink:0}
+.orbit-ring1,.orbit-ring2,.orbit-ring3{position:absolute;border-radius:50%;border:1px solid;pointer-events:none}
+.orbit-ring1{border-color:rgba(192,57,43,.18);animation:orbSpin 22s linear infinite}
+.orbit-ring2{border-color:rgba(212,160,23,.13);animation:orbSpinR 16s linear infinite}
+.orbit-ring3{border-color:rgba(46,204,113,.1);animation:orbSpin 30s linear infinite}
+.orbit-center-star{animation:orbSpin 20s linear infinite;display:block;filter:drop-shadow(0 0 5px rgba(212,160,23,.8))}
+.orbit-nodes{pointer-events:none}
+.orbit-node{position:absolute;transform:translate(-50%,-50%);font-size:10px;filter:drop-shadow(0 0 3px rgba(212,160,23,.5))}
+.bc-village{display:block;flex-shrink:0;border-radius:3px}
+.bc-title{font-family:'Dela Gothic One',sans-serif;background:linear-gradient(135deg,#F1C40F,#E74C3C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;line-height:1.1}
+.bc-sub{color:rgba(212,160,23,.35);font-weight:700;letter-spacing:.5px;text-align:center}
+.dice-row{display:flex;gap:4px;align-items:center}
+.die{border-radius:6px;background:linear-gradient(145deg,#FFF8E0,#EDD090);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;box-shadow:3px 3px 0 rgba(0,0,0,.5);transform-style:preserve-3d;transition:all .12s;flex-shrink:0}
+.die.rolling{animation:dieRoll .1s steps(1) infinite}
+.die.flash{animation:dblFlash .35s ease 4}
+.double-streak{display:flex;align-items:center;gap:3px}
+.dstreak-dot{border-radius:50%;border:2px solid rgba(192,57,43,.35);transition:all .3s;flex-shrink:0}
+.dstreak-dot.lit{background:var(--red2);border-color:var(--red2);box-shadow:0 0 8px var(--rg)}
+.roll-btn{padding:5px 10px;border:none;border-radius:8px;background:linear-gradient(135deg,var(--red2),var(--red));color:var(--gold2);font-family:'Dela Gothic One',sans-serif;cursor:pointer;letter-spacing:.8px;box-shadow:0 3px 12px var(--rg);transition:all .25s;flex-shrink:0}
+.roll-btn:hover:not(:disabled){transform:translateY(-2px)}
+.roll-btn:disabled{opacity:.25;cursor:not-allowed;transform:none}
+.score-float{position:fixed;font-family:'Dela Gothic One',sans-serif;font-size:22px;pointer-events:none;z-index:500;animation:floatUp 1.5s ease forwards}
+.sf-pos{color:#4DFF90;text-shadow:0 0 16px rgba(46,204,113,.7)}
+.sf-neg{color:#FF6666;text-shadow:0 0 16px rgba(192,57,43,.7)}
+/* MODAL */
+.modal-ovl{position:fixed;inset:0;z-index:300;background:rgba(4,2,8,.94);display:flex;align-items:center;justify-content:center;padding:12px;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-ovl.show{opacity:1;pointer-events:all}
+.modal-box{background:linear-gradient(160deg,#1A0E28,#0C0815);border:1px solid rgba(212,160,23,.18);border-radius:18px;padding:22px 18px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 60px 130px rgba(0,0,0,.97);position:relative;transform:translateY(8px) scale(.97);transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+.modal-ovl.show .modal-box{transform:none}
+.modal-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(212,160,23,.5),rgba(192,57,43,.4),rgba(212,160,23,.5),transparent)}
+.m-badge{display:inline-flex;align-items:center;padding:3px 11px;border-radius:16px;font-size:9.5px;font-weight:700;letter-spacing:.8px;margin-bottom:10px}
+.mb-q{background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.28);color:var(--gold2)}
+.mb-nq{background:rgba(0,80,20,.12);border:1px solid rgba(46,204,113,.3);color:#88FFBB}
+.mb-dn{background:rgba(80,36,0,.12);border:1px solid rgba(230,126,34,.3);color:#FFB870}
+.mb-good{background:rgba(26,92,42,.1);border:1px solid rgba(46,204,113,.3);color:#80FFB0}
+.mb-bad{background:rgba(192,57,43,.1);border:1px solid rgba(192,57,43,.3);color:#FFB0B0}
+.mb-jail{background:rgba(74,20,120,.15);border:1px solid rgba(155,89,182,.35);color:#CC99FF}
+.mb-info{background:rgba(30,80,150,.1);border:1px solid rgba(52,152,219,.3);color:#99CCFF}
+.m-title{font-family:'Be Vietnam Pro',sans-serif;font-size:17px;font-weight:900;color:var(--pp);margin-bottom:9px;line-height:1.3}
+.m-body{font-size:12.5px;color:rgba(245,240,255,.65);line-height:1.75;margin-bottom:12px}
+.m-theory{background:rgba(212,160,23,.04);border:1px solid rgba(212,160,23,.12);border-radius:9px;padding:11px;font-size:10.5px;color:rgba(245,240,255,.55);line-height:1.8;margin-bottom:10px}
+.m-rw{display:inline-flex;align-items:center;border-radius:18px;padding:4px 14px;font-size:11px;font-weight:700;margin-bottom:10px}
+.rw-good{background:rgba(26,92,42,.1);border:1px solid rgba(46,204,113,.28);color:#80FFB0}
+.rw-bad{background:rgba(192,57,43,.1);border:1px solid rgba(192,57,43,.28);color:#FFB0B0}
+.m-choices{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.m-ch{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:10px 13px;font-size:12.5px;color:rgba(245,240,255,.78);cursor:pointer;text-align:left;transition:all .2s;display:flex;align-items:flex-start;gap:9px;width:100%}
+.m-ch:hover:not(.locked){background:rgba(212,160,23,.07);border-color:rgba(212,160,23,.27)}
+.m-ch.correct{background:rgba(26,92,42,.16);border-color:rgba(46,204,113,.4);color:#88FFCC}
+.m-ch.wrong{background:rgba(192,57,43,.14);border-color:rgba(192,57,43,.4);color:#FFB0B0}
+.ch-ltr{width:21px;height:21px;border-radius:6px;background:rgba(212,160,23,.07);border:1px solid rgba(212,160,23,.2);color:var(--gold);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.m-fb{min-height:16px;font-size:13px;font-weight:700;text-align:center;margin-bottom:8px}
+.m-ok{width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--red2),var(--red));color:var(--gold2);font-family:'Dela Gothic One',sans-serif;font-size:15px;cursor:pointer;letter-spacing:1.5px;box-shadow:0 4px 18px var(--rg);transition:all .25s}
+.m-ok:hover{transform:translateY(-2px)}
+.jail-visual{display:flex;align-items:center;justify-content:center;margin:12px 0;height:80px;background:rgba(74,20,120,.1);border:1px solid rgba(155,89,182,.25);border-radius:12px;overflow:hidden;position:relative}
+.jail-bar-modal{width:8px;border-radius:3px;background:linear-gradient(180deg,rgba(155,89,182,.8),rgba(100,50,150,.5));flex-shrink:0;margin:0 4px}
+.escape-hint{background:linear-gradient(135deg,rgba(74,20,120,.2),rgba(30,0,60,.15));border:1px solid rgba(155,89,182,.3);border-radius:12px;padding:12px;margin:8px 0;animation:escapeFlash 2s ease-in-out infinite}
+.escape-dice{display:flex;gap:6px;justify-content:center;margin-top:8px}
+.ed{background:linear-gradient(145deg,#FFF8E0,#EDD090);border:2px solid var(--gold);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:2px 2px 0 rgba(0,0,0,.4)}
+/* WIN */
+#s-win{background:radial-gradient(ellipse at 50% 30%,rgba(192,57,43,.2),transparent 55%),var(--ink);overflow-y:auto;padding:20px}
+.win-box{max-width:560px;width:100%;text-align:center}
+.win-trophy{font-size:84px;display:block;animation:pulse 1s ease-in-out infinite}
+.win-title{font-family:'Dela Gothic One',sans-serif;font-size:clamp(28px,8vw,52px);background:linear-gradient(135deg,#FFF9C4,#F1C40F,#D4A017);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:18px}
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:10px;margin:18px 0}
+.pod-item{text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px}
+.pod-bar{display:flex;align-items:center;justify-content:center;border-radius:6px 6px 0 0;font-family:'Dela Gothic One',sans-serif;font-size:14px;min-width:72px;color:white}
+.rank-table{background:rgba(15,9,24,.98);border:1px solid rgba(212,160,23,.1);border-radius:16px;padding:12px;margin:16px 0}
+.rank-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04)}
+.rank-row:last-child{border-bottom:none}
+.toast{position:fixed;top:56px;left:50%;transform:translateX(-50%) translateY(-12px);background:rgba(7,4,10,.97);border:1px solid var(--gold);padding:9px 20px;border-radius:11px;z-index:500;font-size:12px;font-weight:700;color:var(--gold2);box-shadow:0 6px 24px rgba(0,0,0,.8);opacity:0;pointer-events:none;transition:all .3s;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.confetti-p{position:fixed;top:-10px;z-index:999;animation:confettiFall 2.5s ease forwards;opacity:1}
+</style>
+</head><body>
+<div class="toast" id="toast"></div>
+
+<!-- LOGIN -->
+<div class="screen active" id="s-login">
+<div class="lbox">
+  <div style="text-align:center;margin-bottom:12px" id="flag-login"></div>
+  <div class="ltitle">ADMIN</div>
+  <div class="lsub">CỜ DÂN CHỦ · GIÁO VIÊN ĐIỀU HÀNH</div>
+  <div class="card" id="pA">
+    <div class="err" id="err-a"></div>
+    <div class="lbl">TÀI KHOẢN</div>
+    <input class="inp" id="inp-user" placeholder="Nhập tài khoản..." autocomplete="username">
+    <div class="lbl">MẬT KHẨU</div>
+    <input class="inp" id="inp-pass" type="password" placeholder="Nhập mật khẩu..." autocomplete="current-password">
+    <button class="btn-main" onclick="doLogin()">🔐 ĐĂNG NHẬP</button>
+  </div>
+</div>
+</div>
+
+<!-- LOBBY -->
+<div class="screen" id="s-lobby">
+<div style="max-width:480px;width:100%;padding:20px">
+  <div class="card">
+    <div class="err" id="err-c"></div>
+    <div class="lbl">SỐ VÒNG ĐẤU</div>
+    <div class="rnd-sel">
+      <button class="rnd-btn active" id="rb5" onclick="setR(5)">5</button>
+      <button class="rnd-btn" id="rb8" onclick="setR(8)">8</button>
+      <button class="rnd-btn" id="rb10" onclick="setR(10)">10</button>
+      <button class="rnd-btn" id="rb15" onclick="setR(15)">15</button>
+    </div>
+    <div class="lbl">SỐ NGƯỜI CHƠI TỐI ĐA (2–10)</div>
+    <div class="pc-sel" id="pc-sel"></div>
+    <button class="btn-main" onclick="adminCreate()">🎯 TẠO PHÒNG</button>
+  </div>
+  <!-- Lobby waiting -->
+  <div class="card" id="lobby-card" style="display:none">
+    <div style="text-align:center">
+      <div style="font-size:8px;font-weight:700;letter-spacing:3.5px;text-transform:uppercase;color:rgba(192,57,43,.6);margin-bottom:6px">MÃ PHÒNG — Chia sẻ với học sinh</div>
+      <div class="plcode" id="lobby-code"></div>
+      <div style="font-size:10.5px;color:rgba(245,240,255,.38);margin:4px 0 6px">Học sinh vào: <b style="color:var(--gold2)">[tên-web]/play</b> → nhập mã</div>
+      <div id="lobby-players" class="join-grid" style="margin-bottom:14px"></div>
+      <button class="btn-main" id="start-btn" onclick="adminStart()" disabled>
+        🚀 BẮT ĐẦU · <span id="start-count">0</span> người chơi
+      </button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ADMIN GAME -->
+<div class="screen" id="s-admin">
+  <div class="hud">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div id="flag-hud"></div>
+      <div class="hud-brand">CỜ DÂN CHỦ</div>
+      <div class="hud-pill pill-red" id="h-room"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <div style="display:flex;gap:3px;align-items:center" id="h-pips"></div>
+      <div style="font-size:8.5px;font-weight:700;color:rgba(245,240,255,.4);margin-left:4px" id="h-rnd">Vòng 1/5</div>
+      <button class="ctrl-btn ctrl-ghost" onclick="showRef()" style="width:auto;margin:0;padding:4px 9px;font-size:8.5px">📚 Lý thuyết</button>
+    </div>
+  </div>
+  <div class="admin-body">
+    <div class="aside">
+      <div class="aside-card">
+        <div class="aside-hd">🏆 Bảng Điểm</div>
+        <div id="scoreboard"></div>
+      </div>
+      <div class="aside-card" style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+        <div class="aside-hd">📋 Nhật Ký</div>
+        <div class="log-box" id="log-box">Sẵn sàng! Nhấn <b>Tung Xúc Xắc</b>.</div>
+      </div>
+    </div>
+    <div class="board-wrap">
+      <div class="board" id="board">
+        <div class="board-grid" id="board-grid"></div>
+        <div class="bcenter" id="bcenter"></div>
+      </div>
+    </div>
+    <div class="aside">
+      <div class="aside-card">
+        <div class="aside-hd">⚡ Lượt Của</div>
+        <div id="turn-info" style="font-size:12px;font-weight:800;color:var(--gold2);margin-bottom:8px"></div>
+        <button class="ctrl-btn ctrl-roll" id="btn-roll" onclick="doRoll()">🎲 Tung Xúc Xắc</button>
+        <button class="ctrl-btn ctrl-ghost" onclick="showRef()">📚 Xem Lý Thuyết</button>
+      </div>
+      <div class="aside-card" style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0">
+        <div class="aside-hd">📡 Online</div>
+        <div id="online-list" style="flex:1;overflow-y:auto"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WIN -->
+<div class="screen" id="s-win">
+  <div class="win-box">
+    <span class="win-trophy">🏆</span>
+    <div class="win-title">PHƯỚC DÂN PHÁT TRIỂN!</div>
+    <div style="font-size:13px;color:rgba(245,240,255,.45);margin-bottom:16px">Hành trình Dân chủ Xã hội Chủ nghĩa đã hoàn thành!</div>
+    <div class="podium" id="win-podium"></div>
+    <div class="rank-table" id="win-table"></div>
+    <div style="background:rgba(212,160,23,.06);border:1px solid rgba(212,160,23,.18);border-radius:12px;padding:12px 14px;font-size:11.5px;color:rgba(245,240,255,.65);line-height:1.7;margin-bottom:16px" id="win-legend"></div>
+    <button class="btn-main" onclick="location.href='/admin'">🔄 Tạo Phòng Mới</button>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-ovl" id="modal">
+  <div class="modal-box">
+    <div class="m-badge" id="m-badge"></div>
+    <div class="m-title" id="m-title"></div>
+    <div class="m-body" id="m-body"></div>
+    <div id="m-jail-viz" style="display:none"></div>
+    <div class="m-theory" id="m-theory" style="display:none"></div>
+    <div class="m-rw" id="m-rw" style="display:none"></div>
+    <div class="m-choices" id="m-choices"></div>
+    <div id="m-game" style="display:none"></div>
+    <div class="m-fb" id="m-fb"></div>
+    <button class="m-ok" id="m-ok" onclick="closeModal()">Tiếp Tục →</button>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const API='/api/game';
+const post=(action,body)=>fetch(`${API}?action=${action}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
+const get_=(action,params)=>fetch(`${API}?action=${action}&${new URLSearchParams(params)}`).then(r=>r.json());
+
+const PAL=[{bg:'#6B0000',bd:'#FF5555',em:'🔴'},{bg:'#003580',bd:'#4488FF',em:'🔵'},{bg:'#0A3A18',bd:'#33DD77',em:'🟢'},{bg:'#3A0A6A',bd:'#BB55FF',em:'🟣'},{bg:'#6A2800',bd:'#FF8833',em:'🟠'},{bg:'#1E1E2E',bd:'#8899CC',em:'⚫'},{bg:'#1E3A00',bd:'#AAFF44',em:'🟡'},{bg:'#001E3A',bd:'#44FFEE',em:'🔷'},{bg:'#2A001E',bd:'#FF66CC',em:'💗'},{bg:'#1A1A00',bd:'#DDDD00',em:'⭐'}];
+const FACES=['⚀','⚁','⚂','⚃','⚄','⚅'];
+const CELLS=[['start','🏁','KHAI MẠC','','','cell-start'],['q','⭐','Đảng Ủy Xã','party','band-r','cell-q'],['nq','📋','Nghị Quyết','','band-r','cell-nq'],['q','🏛️','UBND Xã','party','band-r','cell-q'],['tax','💸','Đóng Góp','','','cell-tax'],['q','🗳️','Điểm Bầu Cử','election','band-g','cell-q'],['lucky','🎰','VÒNG QUAY','','','cell-lucky'],['q','📜','Hiến Pháp 2013','election','band-g','cell-q'],['mini','🎮','Mini Game','tf','','cell-mini'],['q','🤝','MTTQ','election','band-g','cell-q'],['reform','🏛️','CẢI TẠO\nTƯ TƯỞNG','','','cell-reform'],['q','👥','Hội Đồng Dân','assembly','band-gr','cell-q'],['mini','🎮','Mini Game','order','','cell-mini'],['q','🔍','Ban Thanh Tra','assembly','band-gr','cell-q'],['nq','📋','Nghị Quyết','','band-gr','cell-nq'],['q','📬','Tiếp Dân','reception','band-bl','cell-q'],['mini','🎮','Mini Game','fill','','cell-mini'],['q','💰','Ngân Sách CK','reception','band-bl','cell-q'],['duel','⚔️','THÁCH ĐẤU','','','cell-duel'],['q','📐','Quy Hoạch Đất','reception','band-bl','cell-q'],['park','🌿','CÔNG VIÊN','','','cell-park'],['q','⭐','Chi Bộ Đảng','culture','band-pu','cell-q'],['nq','📋','Nghị Quyết','','band-pu','cell-nq'],['mini','🎮','Mini Game','match','','cell-mini'],['tax','💸','Nộp Phạt QC','','','cell-tax'],['q','🏥','Trạm Y Tế','culture','band-or','cell-q'],['bon','🎁','Thưởng CĐ','','','cell-bon'],['q','🌿','Hương Ước Thôn','culture','band-or','cell-q'],['dn','📣','Dân Nguyện','','band-or','cell-dn'],['q','📱','Cổng TT Điện Tử','digital','band-or','cell-q'],['go-jail','⚠️','ĐI CẢI TẠO!','','','cell-go-jail'],['q','🔍','Giám Sát ND','supervision','band-cy','cell-q'],['mini','🎮','Mini Game','reflex','','cell-mini'],['q','⭐','Đảng Lãnh Đạo','party','band-cy','cell-q'],['nq','📋','Nghị Quyết','','band-cy','cell-nq'],['q','👥','Nhân Dân Làm Chủ','supervision','band-r','cell-q'],['dn','📣','Dân Nguyện','','band-r','cell-dn'],['q','🏛️','Pháp Quyền XHCN','law','band-r','cell-q'],['mini','🎮','Mini Game','quiz','','cell-mini'],['q','🎯','Đích DC Cơ Sở','special','','cell-q']];
+const QS={party:[['Đảng CSVN lãnh đạo HTCT bằng phương thức chính nào?',['Điều hành trực tiếp mọi công việc','Đường lối, công tác cán bộ, kiểm tra, nêu gương','Ban hành mệnh lệnh hành chính','Kiểm soát ngân sách nhà nước'],1,15,'Đảng lãnh đạo qua ① đường lối, chủ trương ② công tác cán bộ ③ kiểm tra, giám sát ④ đảng viên nêu gương.'],['Bản chất DC XHCN VN là gì?',['DC của toàn giai cấp xã hội','DC của nhân dân lao động, Đảng CSVN lãnh đạo, bản chất GC công nhân','DC tư sản được cải tiến','DC đa đảng kiểu mới'],1,15,'DC XHCN VN là nền DC của nhân dân lao động do Đảng CS lãnh đạo; mang bản chất giai cấp công nhân.'],['Điều 4 HP 2013: Đảng là đội tiên phong của ai?',['Chỉ giai cấp công nhân','Chỉ đảng viên và cán bộ','GC công nhân, nhân dân lao động và dân tộc VN','Chỉ liên minh CN-ND'],2,15,'Điều 4 HP 2013: Đảng là đội tiên phong của GC công nhân, đồng thời là đội tiên phong của nhân dân lao động và của dân tộc VN.'],['Mô hình "tam trụ" HTCT XHCN VN?',['Đảng quản lý – NN lãnh đạo – Dân giám sát','Đảng lãnh đạo – NN quản lý – Nhân dân làm chủ','Dân lãnh đạo – Đảng giám sát – NN thực thi','Đảng cầm quyền tuyệt đối'],1,15,'Tam trụ: ① Đảng lãnh đạo ② Nhà nước quản lý ③ Nhân dân làm chủ.']],election:[['Điều 2 HP 2013: "Tất cả quyền lực NN thuộc về..."?',['Đảng CSVN','Hội đồng nhân dân các cấp','Nhân dân','Chính phủ và Quốc hội'],2,15,'Điều 2 HP 2013: "Tất cả quyền lực nhà nước thuộc về Nhân dân."'],['4 nguyên tắc bầu cử theo HP 2013?',['Tự do, công bằng, đa đảng, bí mật','Phổ thông, bình đẳng, trực tiếp, bỏ phiếu kín','Chỉ đảng viên được quyền ứng cử','Bầu gián tiếp qua đại cử tri'],1,15,'4 nguyên tắc: Phổ thông – Bình đẳng – Trực tiếp – Bỏ phiếu kín.'],['MTTQ VN có chức năng quan trọng nào?',['Chỉ tổ chức hoạt động từ thiện','Đại diện nhân dân, phản biện XH, giám sát Đảng-NN','Quản lý kinh tế vùng miền','Điều hành quốc phòng an ninh'],1,15,'MTTQ: đại diện nhân dân, phản biện xã hội, giám sát hoạt động của Đảng và Nhà nước.']],assembly:[['6 quyền DC cơ sở theo Luật THDC 2022?',['Dân biết, bàn, làm, kiểm tra','Dân biết, bàn, làm, kiểm tra, giám sát, thụ hưởng','Dân bầu, bãi miễn, kiểm tra, giám sát','Dân biết, bàn, làm, hưởng'],1,15,'6 quyền DC cơ sở: ① Dân biết ② Dân bàn ③ Dân làm ④ Dân kiểm tra ⑤ Dân giám sát ⑥ Dân thụ hưởng.'],['Nhân dân thực hiện quyền làm chủ qua hình thức nào?',['Chỉ DC đại diện qua QH','Chỉ DC trực tiếp qua trưng cầu dân ý','DC trực tiếp và DC đại diện qua QH, HĐND','Chỉ thông qua MTTQ và đoàn thể'],2,15,'HP 2013: Nhân dân thực hiện quyền lực NN bằng DC trực tiếp và DC đại diện.']],reception:[['Quyền "Dân biết" là quyền gì?',['Chỉ được xem văn bản đã ban hành','Được thông tin về chủ trương, CS Đảng, PL NN và các quyết định liên quan đến quyền lợi','Chỉ biết thông tin kinh tế địa phương','Chỉ biết thông tin bầu cử'],1,15,'"Dân biết" = quyền được thông tin về chủ trương, chính sách của Đảng và PL Nhà nước.'],['UBND do ai bầu?',['Chính phủ trực tiếp bổ nhiệm','HĐND bầu ra','Người dân bầu trực tiếp','Đảng ủy cùng cấp bầu'],1,15,'UBND do HĐND cùng cấp bầu ra.']],culture:[['DC XHCN thực chất hơn DC tư sản ở điểm nào?',['DC TS tốt hơn vì có đa đảng','DC XHCN chỉ dành cho GC công nhân','DC XHCN dành cho đa số nhân dân LĐ, xóa bỏ bóc lột, bảo đảm thực chất','Về bản chất hai loại DC giống nhau'],2,15,'DC XHCN: nhân dân lao động chiếm đa số là chủ thể quyền lực thực sự; xóa bỏ bóc lột.'],['DC XHCN có mấy hình thức thực hiện cơ bản?',['Chỉ có DC đại diện','DC trực tiếp và DC đại diện','DC tham khảo và DC quyết định','Có 4 hình thức khác nhau'],1,15,'DC XHCN thực hiện qua 2 hình thức: ① DC trực tiếp ② DC đại diện.']],digital:[['Cổng TTĐT phục vụ quyền DC nào?',['Chỉ phục vụ thủ tục hành chính','Phục vụ quyền Dân biết và tham gia ý kiến trực tuyến','Chỉ dùng cho cán bộ công chức','Không liên quan đến DC cơ sở'],1,15,'Cổng TTĐT phục vụ quyền "Dân biết" và "Dân bàn" qua phản hồi trực tuyến.']],supervision:[['Giám sát xã hội do ai thực hiện?',['Chỉ cơ quan thanh tra NN','Nhân dân, MTTQ, các tổ chức chính trị-xã hội','Chỉ báo chí và truyền thông','Chỉ Đảng ủy các cấp'],1,15,'Giám sát XH do nhân dân, MTTQ và các tổ chức CTXH thực hiện.'],['"Dân giám sát" khác "Dân kiểm tra" như thế nào?',['Hoàn toàn giống nhau','Kiểm tra là xem xét cụ thể; Giám sát là theo dõi thường xuyên, toàn diện hơn','Chỉ giám sát mới quan trọng','Không có sự phân biệt trong PL'],1,15,'"Dân kiểm tra": xem xét cụ thể. "Dân giám sát": theo dõi thường xuyên, liên tục, toàn diện.']],law:[['NN pháp quyền XHCN VN có đặc trưng nào?',['NN đứng trên PL','HP và PL có giá trị tối cao; NN phải tuân; quyền lực thống nhất có phân công kiểm soát','Không có cơ chế kiểm soát quyền lực','Hoàn toàn phân quyền theo kiểu tư sản'],1,15,'NN pháp quyền XHCN: HP-PL có giá trị tối cao, NN phải tuân, quyền lực thống nhất có phân công.']],special:[['DC XHCN khác DC tư sản về bản chất như thế nào?',['Về bản chất là giống nhau','DC TS bảo vệ thiểu số tư sản; DC XHCN bảo vệ đa số nhân dân lao động','DC XHCN kém DC hơn','DC tư sản tiến bộ hơn vì có đa đảng'],1,20,'DC TS: bảo vệ lợi ích GC TS thiểu số. DC XHCN: bảo vệ nhân dân LĐ đa số, xóa bỏ bóc lột.'],['Vì sao DC XHCN phải gắn với pháp luật?',['Chỉ là thủ tục hình thức','DC mà không có PL = vô chính phủ; PL mà không có DC = chuyên quyền','Chỉ cần pháp luật, không cần DC','PL và DC hoàn toàn độc lập'],1,20,'DC không có PL = vô chính phủ. PL không có DC = chuyên quyền. Cần cả hai.']]};
+const NQ=[{ic:'📗',t:'NQ TW về Dân Chủ Cơ Sở',e:'all+8'},{ic:'📙',t:'NQ Cắt 50% Thủ Tục HC',e:'cur+15'},{ic:'📕',t:'NQ Tăng NS Nông Thôn Mới',e:'all+6'},{ic:'🔴',t:'NQ Siết Kỷ Luật Cán Bộ',e:'all-6'},{ic:'📘',t:'NQ Số Hóa Dịch Vụ Công',e:'cur+12'},{ic:'🟡',t:'NQ Năm Bầu Cử Toàn Quốc',e:'all+10'},{ic:'⚫',t:'NQ Phòng Chống Tham Nhũng',e:'all+5'},{ic:'🔶',t:'NQ Tinh Giản Bộ Máy',e:'all-4'}];
+const DN=[{ic:'✊',t:'Dân Đòi Công Khai Dự Án!',e:'cur+18'},{ic:'📢',t:'Tố Cáo Tham Nhũng Thành Công!',e:'cur+20'},{ic:'😤',t:'Kiến Nghị Bị Bỏ Qua!',e:'all-8'},{ic:'🌟',t:'Ý Kiến Dân Thành Chính Sách!',e:'all+7'},{ic:'🗣️',t:'Phiên Giải Trình HĐND Thắng!',e:'cur+15'},{ic:'💪',t:'BTTND Phát Hiện Gian Lận Đất!',e:'cur+22'},{ic:'🙏',t:'Dân Đóng Góp Xây Trường Mới!',e:'all+9'}];
+const LUCKY=[{ic:'💰',t:'+15 Uy Tín Cộng Đồng!',v:15},{ic:'🎁',t:'+10 Phần Thưởng Tốt Đẹp!',v:10},{ic:'⭐',t:'+20 Cống Hiến Xuất Sắc!',v:20},{ic:'📉',t:'-8 Kỷ Luật Hành Chính!',v:-8},{ic:'💸',t:'-5 Đóng Góp Quỹ Thôn!',v:-5},{ic:'🎯',t:'+12 Sáng Kiến Hay!',v:12},{ic:'😴',t:'0 Điểm — Nghỉ Ngơi.',v:0},{ic:'🔄',t:'ĐỔI ĐIỂM với người tiếp theo!',v:0,swap:true}];
+
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const pickQ=z=>{const p=QS[z]||QS.party;return p[~~(Math.random()*p.length)]};
+const getP=p=>PAL[(p?.pi||0)%PAL.length];
+
+let myRoom='',G={},rolling=false,answered=false,_moving=false,_pollTs=0;
+let selMaxR=5,selMaxP=6;
+
+// PC sel buttons
+function buildPCSel(){
+  const d=$('pc-sel');d.innerHTML='';
+  for(let i=2;i<=10;i++){const b=document.createElement('button');b.className='pc-btn'+(i===selMaxP?' active':'');b.textContent=i;b.onclick=()=>{selMaxP=i;buildPCSel()};d.appendChild(b);}
+}
+buildPCSel();
+function setR(n){selMaxR=n;[5,8,10,15].forEach(x=>{const b=$('rb'+x);if(b)b.className='rnd-btn'+(x===n?' active':'')});}
+
+function buildFlag(s){const pw=Math.round(2.5*s),fh=Math.round(56*s),fw=Math.round(84*s);return`<div class="vn-flag-wrap"><div style="width:${pw}px;height:${fh}px" class="vn-pole"></div><svg class="vn-flag-svg" width="${fw}" height="${fh}" viewBox="0 0 120 80"><defs><clipPath id="fc${s}"><path class="vn-flag-body" d="M0,0 Q30,5 60,0 Q90,-5 120,0 L120,80 Q90,85 60,80 Q30,75 0,80 Z"/></clipPath></defs><path class="vn-flag-body" d="M0,0 Q30,5 60,0 Q90,-5 120,0 L120,80 Q90,85 60,80 Q30,75 0,80 Z" fill="#D42B2B"/><polygon class="vn-star" points="60,10 64.7,23.6 79,23.6 67.6,31.4 72.4,45 60,37.2 47.6,45 52.4,31.4 41,23.6 55.3,23.6" clip-path="url(#fc${s})"/></svg></div>`;}
+$('flag-login').innerHTML=buildFlag(1.6);
+
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2800)}
+function addLog(msg){const lb=$('log-box');lb.innerHTML=`<span style="color:rgba(245,240,255,.4);font-size:8px">${new Date().toLocaleTimeString('vi')}</span> ${msg}<br>`+lb.innerHTML}
+function floatScore(n,x,y){const el=document.createElement('div');el.className='score-float '+(n>0?'sf-pos':'sf-neg');el.textContent=(n>0?'+':'')+n;el.style.cssText=`left:${x||50}%;top:${y||45}%`;document.body.appendChild(el);setTimeout(()=>el.remove(),1600)}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active')}
+
+// LOGIN
+async function doLogin(){
+  const u=$('inp-user').value.trim(),p=$('inp-pass').value;
+  const r=await post('login',{user:u,pass:p});
+  if(r.ok){showScreen('s-lobby')}
+  else{$('err-a').textContent=r.err||'Sai!';setTimeout(()=>$('err-a').textContent='',3000)}
+}
+$('inp-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+
+// CREATE ROOM
+async function adminCreate(){
+  const r=await post('create',{maxR:selMaxR,maxP:selMaxP});
+  if(!r.ok){alert(r.err);return}
+  myRoom=r.code;
+  $('lobby-code').textContent=r.code;
+  $('lobby-card').style.display='block';
+  startPoll();
+}
+
+// START
+async function adminStart(){
+  const r=await post('start',{code:myRoom});
+  if(!r.ok){alert(r.err||'Lỗi!');return}
+  G=r.state;
+  showScreen('s-admin');
+  buildAdminBoard();buildBoardCenter();
+  renderAdmin(G);
+  _pollTs=G.ts||0;
+  startPoll();
+}
+
+// POLLING
+let _pollActive=false;
+async function startPoll(){
+  if(_pollActive)return;_pollActive=true;
+  while(true){
+    try{
+      const r=await get_('poll',{code:myRoom,ts:_pollTs});
+      if(r.ok&&r.state){
+        G=r.state;_pollTs=G.ts||_pollTs;
+        if(G.phase==='lobby')handleLobby(G);
+        else if(G.phase==='playing'&&$('s-admin').classList.contains('active'))renderAdmin(G);
+        else if(G.phase==='ended'){_pollActive=false;showWin(G);return;}
+      }
+    }catch(e){}
+    await sleep(200);
+  }
+}
+
+function handleLobby(s){
+  const count=(s.order||[]).length;
+  $('start-count').textContent=count;
+  $('start-btn').disabled=count<2;
+  $('lobby-players').innerHTML=(s.order||[]).map(pid=>{const p=s.players?.[pid];if(!p)return'';return`<div class="join-card"><div style="font-size:22px;margin-bottom:3px">${p.emoji}</div><div style="font-size:10px;font-weight:700">${p.name}</div><div style="font-size:8px;color:rgba(245,240,255,.35)">✓ Online</div></div>`}).join('');
+}
+
+// BOARD BUILD
+let boardBuilt=false;
+function buildAdminBoard(){
+  if(boardBuilt)return;boardBuilt=true;
+  const board=$('board');
+  const sz=Math.min(window.innerWidth-340,window.innerHeight-56,700);
+  board.style.width=board.style.height=Math.max(280,sz)+'px';
+  const bg=$('board-grid');bg.innerHTML='';
+  function cellPos(i){if(i<11)return{r:10,c:10-i};if(i<21)return{r:10-(i-10),c:0};if(i<31)return{r:0,c:i-20};return{r:i-30,c:10}}
+  for(let row=0;row<11;row++){for(let col=0;col<11;col++){
+    const isEdge=row===0||row===10||col===0||col===10;
+    const div=document.createElement('div');div.style.gridRow=row+1;div.style.gridColumn=col+1;
+    if(!isEdge){bg.appendChild(div);continue}
+    let ci=-1;for(let i=0;i<40;i++){const p=cellPos(i);if(p.r===row&&p.c===col){ci=i;break}}
+    if(ci<0){div.style.visibility='hidden';bg.appendChild(div);continue}
+    const cd=CELLS[ci];
+    const side=row===10&&col!==0&&col!==10?'bot':row===0&&col!==0&&col!==10?'top':col===0&&row!==0&&row!==10?'lft':'rgt';
+    div.className=`cell ${cd[5]||''} ${side}`;div.id=`ac${ci}`;
+    if(cd[0]==='reform')div.innerHTML=`<div class="jail-bars">${Array.from({length:7},()=>`<div class="jail-bar" style="height:${40+Math.random()*45}%"></div>`).join('')}</div>`;
+    div.innerHTML+=(cd[4]?`<div class="cband ${cd[4]}"></div>`:'')+`<div class="c-icon">${cd[1]}</div><div class="c-name">${cd[2]}</div>`;
+    bg.appendChild(div);
+  }}
+}
+
+function buildBoardCenter(){
+  const bc=$('bcenter');const board=$('board');
+  const s=board.offsetWidth;
+  const orbitDiam=Math.round(s*.28);
+  const nodes=[{a:0,ic:'🏛️'},{a:60,ic:'🗳️'},{a:120,ic:'📋'},{a:180,ic:'👥'},{a:240,ic:'⭐'},{a:300,ic:'🔍'}];
+  const nodesHtml=nodes.map(n=>{const r=orbitDiam/2-8;const x=50+r/orbitDiam*100*Math.cos(n.a*Math.PI/180);const y=50+r/orbitDiam*100*Math.sin(n.a*Math.PI/180);return`<div class="orbit-node" style="left:${x}%;top:${y}%">${n.ic}</div>`}).join('');
+  const flagHtml=buildFlag(.35);
+  const vw=Math.round(s*.55),vh=Math.round(vw*.32);
+  const titleFsz=Math.round(s*.009),subFsz=Math.round(s*.0058);
+  const diceSz=Math.round(s*.032),diceFsz=Math.round(s*.022);
+  const dblDotSz=Math.round(s*.009);
+  bc.innerHTML=`<div class="bc-top"><div class="bc-flag-row">${flagHtml}</div><div class="orbit-wrap" style="width:${orbitDiam}px;height:${orbitDiam}px;flex-shrink:0"><div class="orbit-ring1" style="inset:0"></div><div class="orbit-ring2" style="inset:12%"></div><div class="orbit-ring3" style="inset:24%"></div><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><span class="orbit-center-star" style="font-size:${Math.round(s*.04)}px">⭐</span></div><div class="orbit-nodes" style="position:absolute;inset:0">${nodesHtml}</div></div></div><svg viewBox="0 0 300 90" width="${vw}" height="${vh}" class="bc-village" style="border-radius:3px"><rect width="300" height="90" fill="rgba(10,5,18,.5)"/><path d="M0,82 L55,38 L110,82Z" fill="rgba(25,55,28,.55)"/><path d="M75,82 L142,24 L210,82Z" fill="rgba(20,48,22,.65)"/><path d="M185,82 L238,40 L295,82Z" fill="rgba(25,55,28,.55)"/><rect x="116" y="60" width="58" height="22" fill="rgba(170,85,18,.6)" rx="1"/><path d="M108,60 L145,40 L182,60Z" fill="rgba(190,28,28,.55)"/><text x="145" y="54" text-anchor="middle" fill="rgba(241,196,15,.75)" font-size="5.5" font-family="sans-serif" font-weight="bold">UBND XÃ</text><rect x="128" y="68" width="8" height="14" fill="rgba(60,30,5,.5)"/></svg><div style="width:100%;text-align:center;flex-shrink:0"><div class="bc-title" style="font-size:${titleFsz}px">LÀNG XÃ PHƯỚC DÂN</div><div class="bc-sub" style="font-size:${subFsz}px;margin-bottom:2px">DÂN CHỦ XHCN · CH.4</div><div class="dice-row" style="justify-content:center;margin:${Math.round(s*.004)}px 0"><div class="die" id="die1" style="width:${diceSz}px;height:${diceSz}px;font-size:${diceFsz}px">🎲</div><div class="die" id="die2" style="width:${diceSz}px;height:${diceSz}px;font-size:${diceFsz}px">🎲</div></div><div class="double-streak" style="justify-content:center;margin-bottom:${Math.round(s*.005)}px"><div class="dstreak-dot" id="ds1" style="width:${dblDotSz}px;height:${dblDotSz}px"></div><div class="dstreak-dot" id="ds2" style="width:${dblDotSz}px;height:${dblDotSz}px"></div><div class="dstreak-dot" id="ds3" style="width:${dblDotSz}px;height:${dblDotSz}px"></div><span style="font-size:${Math.round(s*.006)}px;font-weight:700;color:rgba(192,57,43,.55);letter-spacing:.5px;margin-left:2px">ĐÔI</span></div><button class="roll-btn" id="roll-btn-bc" style="font-size:${Math.round(s*.0095)}px" onclick="doRoll()">🎲 TUNG XÚC XẮC</button></div>`;
+}
+
+function renderAdmin(s){
+  if(!s?.players)return;
+  const ord=s.order||[];
+  const maxSc=Math.max(...ord.map(pid=>s.players[pid]?.score||0),1);
+  $('scoreboard').innerHTML=ord.map((pid,i)=>{const p=s.players[pid];if(!p)return'';const pal=getP(p);const cur=i===s.turn;return`<div class="sc-row${cur?' cur':''}${p.jailTurns>0?' jailed':''}"><div class="sc-av" style="background:${pal.bg};border-color:${pal.bd}">${p.emoji}</div><div style="flex:1;min-width:0"><div class="sc-name">${cur?'▶ ':''}${p.name}</div><div class="sc-bar-w"><div class="sc-bar" style="width:${(p.score/maxSc*100).toFixed(1)}%;background:${pal.bd}"></div></div></div><div style="text-align:right"><div class="sc-pts" style="color:${pal.bd}">${p.score}</div>${p.jailTurns>0?`<div class="sc-jail-badge">⛔ ${p.jailTurns}</div>`:''}</div></div>`}).join('');
+  const curP=s.players[ord[s.turn]];
+  if(curP){const pal=getP(curP);$('turn-info').innerHTML=`${curP.emoji} ${curP.name}`;$('turn-info').style.color=pal.bd;$('btn-roll').disabled=rolling;const rbc=$('roll-btn-bc');if(rbc)rbc.disabled=rolling}
+  const pips=$('h-pips');pips.innerHTML='';for(let i=1;i<=s.maxR;i++){const d=document.createElement('div');d.className='hud-pip'+(i<s.round?' done':i===s.round?' now':'');pips.appendChild(d)}
+  $('h-rnd').textContent=`Vòng ${s.round}/${s.maxR}`;
+  $('h-room').textContent=`🎮 ${myRoom}`;
+  [1,2,3].forEach(i=>{const d=$(`ds${i}`);if(d)d.classList.toggle('lit',i<=(s.dbl||0))});
+  const d1=$('die1'),d2=$('die2');
+  if(s.dice&&d1&&d2){d1.textContent=FACES[s.dice[0]-1];d2.textContent=FACES[s.dice[1]-1]}
+  $('online-list').innerHTML=ord.map(pid=>{const p=s.players[pid];if(!p)return'';const pal=getP(p);return`<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.03)"><div style="width:6px;height:6px;border-radius:50%;background:#2ECC71;animation:onPing 1.8s infinite;flex-shrink:0"></div><div style="font-size:9px;color:rgba(245,240,255,.6);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.emoji} ${p.name}</div><div style="font-size:9.5px;font-weight:700;color:${pal.bd}">${p.score}</div></div>`}).join('');
+  document.querySelectorAll('.cell-tokens').forEach(t=>t.remove());
+  ord.forEach((pid,pi)=>{const p=s.players[pid];if(!p)return;const cel=document.getElementById(`ac${p.pos}`);if(!cel)return;let tok=cel.querySelector('.cell-tokens');if(!tok){tok=document.createElement('div');tok.className='cell-tokens';cel.appendChild(tok)}const pal=getP(p);const isCur=pi===s.turn;const d=document.createElement('div');d.className='token-dot';d.style.cssText=`background:${pal.bg};border:1px solid ${pal.bd};${isCur?'box-shadow:0 0 7px '+pal.bd+';animation:pulse 1s infinite':''}`;d.textContent=p.emoji;tok.appendChild(d);});
+}
+
+// ROLL
+async function doRoll(){
+  if(rolling||_moving)return;rolling=true;
+  $('btn-roll').disabled=true;const rbc=$('roll-btn-bc');if(rbc)rbc.disabled=true;
+  const s=G;const ord=s.order||[];const p={...s.players[ord[s.turn]]};
+  if(!p.id){rolling=false;$('btn-roll').disabled=false;if(rbc)rbc.disabled=false;return}
+  const d1=$('die1'),d2=$('die2');
+  if(d1){d1.classList.add('rolling');d2.classList.add('rolling')}
+  await sleep(650);
+  const r1=1+~~(Math.random()*6),r2=1+~~(Math.random()*6);
+  if(d1){d1.classList.remove('rolling');d2.classList.remove('rolling');d1.textContent=FACES[r1-1];d2.textContent=FACES[r2-1]}
+  const isDouble=r1===r2,total=r1+r2;
+  if(isDouble&&d1){d1.classList.add('flash');d2.classList.add('flash');setTimeout(()=>{d1.classList.remove('flash');d2.classList.remove('flash')},1500)}
+  const s2=(await post('update',{code:myRoom,patch:{dice:[r1,r2]}})).state;G=s2;
+
+  if(p.jailTurns>0){
+    if(isDouble){
+      p.jailTurns=0;await apiSaveP(ord[s.turn],p);addLog(`🎉 ${p.emoji} ${p.name} tung ĐÔI! THOÁT CẢI TẠO!`);
+      await doMove(G,s.turn,total,isDouble);
+    } else {
+      p.jailTurns=Math.max(0,p.jailTurns-1);await apiSaveP(ord[s.turn],p);
+      addLog(`⛔ ${p.emoji} còn Cải Tạo (${p.jailTurns} lượt)`);
+      openModal({badge:'mb-jail',bt:'⛔ Chưa Thoát!',title:'Vẫn Đang Cải Tạo Tư Tưởng',
+        body:`${p.emoji} <b>${p.name}</b> tung ${r1}+${r2} — không phải đôi!`,jailViz:true,
+        theory:'"Quyền làm chủ phải gắn với trách nhiệm" — nguyên tắc DC XHCN.',
+        rw:'Chưa thoát',rwBad:true,ok:async()=>{closeModal();const ns=await getState();await endTurn(ns,false)}});
+    }
+    rolling=false;return;
+  }
+
+  let dc=s.dbl||0;
+  if(isDouble){
+    dc++;
+    if(dc>=3){
+      p.score=Math.max(0,p.score-10);p.jailTurns=1;p.pos=10;
+      await apiSaveP(ord[s.turn],p);await apiPatch({dbl:0});
+      addLog(`🚨 ${p.emoji} 3 đôi liên tiếp! BỊ CẢI TẠO! -10đ`);
+      openModal({badge:'mb-jail',bt:'🚨 3 Đôi Liên Tiếp!',title:'Cải Tạo Tư Tưởng!',
+        body:`${p.emoji} <b>${p.name}</b> tung đôi 3 lần! Bị kỷ luật! <b>-10 điểm</b>.`,jailViz:true,
+        theory:'Nguyên tắc tập trung DC: quyền lực phải có trách nhiệm và kiểm soát.',
+        rw:'-10 điểm + Cải Tạo',rwBad:true,ok:async()=>{closeModal();const ns=await getState();await endTurn(ns,false)}});
+      rolling=false;return;
+    }
+    await apiPatch({dbl:dc});
+    addLog(`🎲 ${p.emoji} ĐÔI ${r1}+${r2}=${total}! Tung thêm!`);toast(`🎲 ĐÔI! ${p.name} tung thêm!`);
+  } else {
+    await apiPatch({dbl:0});addLog(`🎲 ${p.emoji} ${r1}+${r2}=${total}`);
+  }
+  await doMove(G,s.turn,total,isDouble);rolling=false;
+}
+
+async function doMove(s,pi,steps,isDouble){
+  _moving=true;
+  const ns=await getState();s=ns;
+  const ord=s.order||[];const p={...s.players[ord[pi]]};
+  for(let i=0;i<steps;i++){
+    const npos=(p.pos+1)%40;
+    if(npos===0&&i>0){p.score+=10;addLog(`🏁 ${p.emoji} qua KHAI MẠC! +10!`);floatScore(10,48,55)}
+    p.pos=npos;await apiSaveP(ord[pi],p);
+    const cel=document.getElementById(`ac${npos}`);
+    if(cel){cel.classList.add('hl');setTimeout(()=>cel.classList.remove('hl'),550)}
+    const rs=await getState();G=rs;renderAdmin(rs);await sleep(260);
+  }
+  _moving=false;
+  const s3=await getState();await landOn(s3,pi,isDouble);
+}
+
+async function landOn(s,pi,isDouble){
+  const ord=s.order||[];const p={...s.players[ord[pi]]};const cd=CELLS[p.pos];
+  addLog(`📍 ${p.emoji} ${p.name} → Ô ${p.pos}: ${cd[1]} ${cd[2]}`);
+  const afterOk=async()=>{closeModal();const ns=await getState();await endTurn(ns,isDouble)};
+  const afterOkNoDouble=async()=>{closeModal();const ns=await getState();await endTurn(ns,false)};
+  switch(cd[0]){
+    case 'q':{const q=pickQ(cd[3]||'party');answered=false;
+      openModal({badge:'mb-q',bt:`❓ Câu Hỏi — ${p.emoji} ${p.name}`,title:q[0],body:'',theory:q[4],choices:q[1],ans:q[2],pts:q[3],pi,isDouble});break}
+    case 'nq':{const c=NQ[~~(Math.random()*NQ.length)];const n=parseInt(c.e.slice(3));let rw='';
+      if(c.e.startsWith('all')){const upd={};ord.forEach(pid=>{upd[pid]={...s.players[pid],score:Math.max(0,(s.players[pid].score||0)+n)}});await post('updatePlayers',{code:myRoom,players:upd});rw=`${n>0?'+':''}${n} tất cả`}
+      else{p.score=Math.max(0,p.score+n);await apiSaveP(ord[pi],p);rw=`${n>0?'+':''}${n} cho ${p.name}`}
+      addLog(`📋 NQ: ${c.t} → ${rw}`);floatScore(n,48,55);
+      openModal({badge:'mb-nq',bt:'📋 Nghị Quyết',title:c.t,body:`<div style="font-size:40px;text-align:center;margin:10px 0">${c.ic}</div>`,rw,rwBad:n<0,ok:async()=>{closeModal();const ns=await getState();await endTurn(ns,isDouble)}});break}
+    case 'dn':{const c=DN[~~(Math.random()*DN.length)];const n=parseInt(c.e.slice(3));let rw='';
+      if(c.e.startsWith('all')){const upd={};ord.forEach(pid=>{upd[pid]={...s.players[pid],score:Math.max(0,(s.players[pid].score||0)+n)}});await post('updatePlayers',{code:myRoom,players:upd});rw=`${n>0?'+':''}${n} tất cả`}
+      else{p.score=Math.max(0,p.score+n);await apiSaveP(ord[pi],p);rw=`${n>0?'+':''}${n} cho ${p.name}`}
+      addLog(`📣 Dân Nguyện: ${c.t} → ${rw}`);floatScore(n,48,55);
+      openModal({badge:'mb-dn',bt:'📣 Dân Nguyện',title:c.t,body:`<div style="font-size:40px;text-align:center;margin:10px 0">${c.ic}</div>`,rw,rwBad:n<0,ok:async()=>{closeModal();const ns=await getState();await endTurn(ns,isDouble)}});break}
+    case 'bon':p.score+=12;await apiSaveP(ord[pi],p);floatScore(12,48,55);addLog(`🎁 ${p.emoji} +12!`);
+      openModal({badge:'mb-good',bt:'🎁 Thưởng',title:'Nhận Thưởng Cộng Đồng! +12',body:`${p.emoji} <b>${p.name}</b> tích cực tham gia DC cơ sở!`,rw:'+12 Điểm',ok:async()=>{closeModal();const ns=await getState();await endTurn(ns,isDouble)}});break;
+    case 'tax':p.score=Math.max(0,p.score-5);await apiSaveP(ord[pi],p);floatScore(-5,48,55);addLog(`💸 ${p.emoji} -5!`);
+      openModal({badge:'mb-bad',bt:'💸 Đóng Góp',title:'Đóng Góp Quỹ Thôn! -5',body:'Đóng góp xây dựng cộng đồng.',rw:'-5 Điểm',rwBad:true,ok:async()=>{closeModal();const ns=await getState();await endTurn(ns,isDouble)}});break;
+    case 'park':p.score+=3;await apiSaveP(ord[pi],p);floatScore(3,48,55);addLog(`🌿 ${p.emoji} +3!`);
+      openModal({badge:'mb-good',bt:'🌿 Công Viên',title:'Nghỉ Tại Công Viên! +3',body:'Tận hưởng không gian xanh.',rw:'+3 Điểm',ok:async()=>{closeModal();const ns=await getState();await endTurn(ns,isDouble)}});break;
+    case 'reform':openModal({badge:'mb-jail',bt:'🏛️ Thăm Khu Cải Tạo',title:'Chỉ Đang Thăm Quan!',body:`${p.emoji} <b>${p.name}</b> ghé thăm — bạn an toàn!`,ok:async()=>{closeModal();const ns=await getState();await endTurn(ns,isDouble)}});break;
+    case 'go-jail':p.score=Math.max(0,p.score-8);p.jailTurns=1;p.pos=10;
+      await apiSaveP(ord[pi],p);floatScore(-8,48,55);addLog(`⚠️ ${p.emoji} BỊ CẢI TẠO! -8đ`);
+      openModal({badge:'mb-jail',bt:'⚠️ DC Hình Thức!',title:'Bị Phát Hiện — Cải Tạo!',
+        body:`${p.emoji} <b>${p.name}</b> bị phát hiện "DC hình thức"! <b>-8 điểm</b>.`,jailViz:true,
+        theory:'"DC hình thức": họp đủ thủ tục nhưng kết quả đã định sẵn.',
+        rw:'-8 điểm + Cải Tạo',rwBad:true,ok:afterOkNoDouble});break;
+    case 'lucky':doLucky(s,pi,isDouble);break;
+    case 'duel':
+      if(ord.length>=2){const others=ord.filter((_,i)=>i!==pi);const oppId=others[~~(Math.random()*others.length)];const opp=s.players[oppId];const q=pickQ('party');answered=false;
+        openModal({badge:'mb-info',bt:`⚔️ Thách Đấu — ${p.emoji} vs ${opp.emoji}`,title:q[0],body:`<b>${p.emoji} ${p.name}</b> thách đấu <b>${opp.emoji} ${opp.name}</b>!`,choices:q[1],ans:q[2],pts:15,pi,duelOpp:oppId,isDouble})}
+      else{const ns=await getState();await endTurn(ns,isDouble)}break;
+    default:{const ns=await getState();await endTurn(ns,isDouble)}
+  }
+  const rs=await getState();G=rs;renderAdmin(rs);
+}
+
+function doLucky(s,pi,isDouble){
+  const ord=s.order||[];const p=s.players[ord[pi]];
+  const mg=$('m-game');
+  openModal({badge:'mb-good',bt:'🎰 Vòng Quay May Mắn',title:'Quay Vòng Quay Dân Chủ!',body:'Nhấn QUAY!',hideOk:true});
+  mg.style.display='block';const items=LUCKY;const N=items.length;const aDeg=360/N;
+  const cols=['#7A0000','#14356A','#0A3A14','#4A1278','#6A2000','#006040','#7A6000','#003040'];
+  mg.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:4px 0"><div style="position:relative;width:min(220px,62vw);height:min(220px,62vw)"><canvas id="spin-c" width="220" height="220" style="width:100%;height:100%;border-radius:50%;box-shadow:0 0 28px rgba(212,160,23,.28)"></canvas><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:22px;height:22px;background:var(--gold2);border-radius:50%;border:3px solid var(--ink);z-index:2;box-shadow:0 0 12px rgba(212,160,23,.8)"></div><div style="position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:18px solid var(--gold2);z-index:3"></div></div><button id="spin-btn" style="padding:11px 28px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--red2),var(--red));color:var(--gold2);font-family:'Dela Gothic One',sans-serif;font-size:15px;cursor:pointer;letter-spacing:1px;box-shadow:0 4px 16px var(--rg)">🎰 QUAY!</button><div id="spin-res" style="font-size:13px;font-weight:700;color:rgba(212,160,23,.45);min-height:20px"></div></div>`;
+  const canvas=$('spin-c');const ctx=canvas.getContext('2d');const cx=110,cy=110,rad=107;let rot=0;
+  function draw(r){ctx.clearRect(0,0,220,220);items.forEach((item,i)=>{const sa=r+i*aDeg*Math.PI/180,ea=r+(i+1)*aDeg*Math.PI/180;ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,rad,sa,ea);ctx.closePath();ctx.fillStyle=cols[i%cols.length];ctx.fill();ctx.strokeStyle='rgba(0,0,0,.25)';ctx.lineWidth=1;ctx.stroke();ctx.save();ctx.translate(cx,cy);ctx.rotate(r+i*aDeg*Math.PI/180+aDeg*Math.PI/360);ctx.textAlign='right';ctx.fillStyle='rgba(255,255,255,.9)';ctx.font='bold 7.5px Be Vietnam Pro,sans-serif';ctx.fillText(item.ic+' '+item.t.slice(0,12),rad-5,3);ctx.restore();});ctx.beginPath();ctx.arc(cx,cy,rad,0,Math.PI*2);ctx.strokeStyle='rgba(212,160,23,.4)';ctx.lineWidth=2.5;ctx.stroke();}
+  draw(0);let spinning=false;
+  $('spin-btn').onclick=()=>{if(spinning)return;spinning=true;$('spin-btn').disabled=true;const total=(5+Math.random()*4)*360+Math.random()*360;const dur=2800;const t0=performance.now();const r0=rot;
+    function anim(now){const t=Math.min((now-t0)/dur,1);const ease=t<1?1-Math.pow(1-t,4):1;rot=(r0+total*ease)*Math.PI/180;draw(rot);
+      if(t<1){requestAnimationFrame(anim)}
+      else{const deg=((r0+total)%360);const idx=Math.floor(((270-deg+360)%360)/aDeg)%N;const result=items[idx];
+        $('spin-res').innerHTML=`<span style="color:${result.v<0?'#FF8888':'#80FFBB'}">${result.ic} ${result.t}</span>`;
+        $('m-ok').style.display='block';
+        $('m-ok').onclick=async()=>{
+          if(result.swap&&ord.length>1){const ni=(pi+1)%ord.length;const next=s.players[ord[ni]];const upd={};upd[ord[pi]]={...p,score:next.score};upd[ord[ni]]={...next,score:p.score};await post('updatePlayers',{code:myRoom,players:upd});addLog(`🔄 ${p.emoji} Đổi điểm với ${next.emoji}!`);}
+          else if(result.v!==0){const pu={...s.players[ord[pi]],score:Math.max(0,(s.players[ord[pi]].score||0)+result.v)};await apiSaveP(ord[pi],pu);floatScore(result.v,48,55);addLog(`🎰 ${p.emoji}: ${result.t}`);}
+          closeModal();const ns=await getState();await endTurn(ns,isDouble);};}}
+    requestAnimationFrame(anim);};
+}
+
+window.handleAns=async(idx,ans,pts,pi,duelOpp,isDouble)=>{
+  if(answered)return;answered=true;
+  document.querySelectorAll('.m-ch').forEach((b,i)=>{b.classList.add('locked');if(i===ans)b.classList.add('correct');else if(i===idx)b.classList.add('wrong');b.onclick=null});
+  const s=await getState();const ord=s.order||[];
+  const ok=idx===ans;const p={...s.players[ord[pi]]};const fb=$('m-fb');
+  if(duelOpp){
+    const opp={...s.players[duelOpp]};
+    if(ok){p.score+=pts;p.wins=(p.wins||0)+1;opp.score=Math.max(0,opp.score-8);fb.innerHTML=`<span style="color:#66FFAA">✅ ${p.emoji} THẮNG! +${pts} vs ${opp.emoji} -8</span>`}
+    else{opp.score+=pts;opp.wins=(opp.wins||0)+1;p.score=Math.max(0,p.score-8);fb.innerHTML=`<span style="color:#FF9999">❌ ${opp.emoji} THẮNG!</span>`}
+    const upd={};upd[ord[pi]]=p;upd[duelOpp]=opp;await post('updatePlayers',{code:myRoom,players:upd});
+    addLog(ok?`⚔️ ${p.emoji} thắng duel!`:`⚔️ ${opp.emoji} thắng duel!`);
+  } else {
+    if(ok){const lose=~~(pts/3);p.score+=pts;floatScore(pts,48,55);fb.innerHTML=`<span style="color:#66FFAA">✅ Chính xác! +${pts}đ!</span>`;addLog(`✅ ${p.emoji} ĐÚNG! +${pts}`)}
+    else{const lose=~~(pts/3);p.score=Math.max(0,p.score-lose);floatScore(-lose,48,55);fb.innerHTML=`<span style="color:#FF9999">❌ Sai! -${lose}đ</span>`;addLog(`❌ ${p.emoji} Sai! -${lose}`)}
+    await apiSaveP(ord[pi],p);
+  }
+  $('m-ok').style.display='block';
+  $('m-ok').onclick=async()=>{closeModal();const ns=await getState();await endTurn(ns,isDouble)};
+};
+
+async function endTurn(s,isDouble){
+  const ord=s.order||[];let turn=s.turn;let round=s.round||1;
+  if(!isDouble){turn=(turn+1)%ord.length;if(turn===0)round++}
+  if(round>s.maxR){await apiPatch({phase:'ended',dice:null});return}
+  await apiPatch({turn,round,dice:null});
+  const s2=await getState();const nP=s2.players?.[ord[turn]];
+  if(nP)addLog(`▶ Lượt của ${nP.emoji} ${nP.name}`);
+  G=s2;renderAdmin(s2);
+  $('btn-roll').disabled=false;const rbc=$('roll-btn-bc');if(rbc)rbc.disabled=false;
+}
+
+function openModal({badge,bt,title,body,jailViz,theory,rw,rwBad,choices,ans,pts,pi,duelOpp,isDouble,ok,hideOk}){
+  $('m-badge').className='m-badge '+(badge||'');$('m-badge').textContent=bt||'';
+  $('m-title').textContent=title||'';$('m-body').innerHTML=body||'';
+  $('m-fb').textContent='';$('m-game').style.display='none';$('m-game').innerHTML='';
+  const jv=$('m-jail-viz');
+  if(jailViz){jv.style.display='block';jv.innerHTML=`<div class="jail-visual">${Array.from({length:12},(_,i)=>`<div class="jail-bar-modal" style="height:${50+Math.random()*40}%;animation:jailBarAnim ${1.8+i*.15}s ease-in-out infinite;animation-delay:${i*.12}s"></div>`).join('')}<div style="position:absolute;font-size:32px;opacity:.15">🏛️</div></div><div class="escape-hint"><div style="font-size:11px;font-weight:700;color:#CC99FF;margin-bottom:6px">🎲 Điều Kiện Thoát:</div><div style="font-size:11px;color:rgba(200,150,255,.8)">Tung xúc xắc ra <b>hai số bằng nhau</b> (đôi)</div><div class="escape-dice"><div class="ed">⚁</div><div class="ed">⚁</div></div></div>`;}
+  else jv.style.display='none';
+  const th=$('m-theory');th.style.display=theory?'block':'none';if(theory)th.textContent=theory;
+  const mw=$('m-rw');
+  if(rw){mw.style.display='inline-flex';mw.className='m-rw '+(rwBad?'rw-bad':'rw-good');mw.textContent=rw}else mw.style.display='none';
+  const mc=$('m-choices');
+  if(choices?.length){mc.innerHTML=choices.map((c,i)=>`<button class="m-ch" onclick="handleAns(${i},${ans},${pts},${pi},'${duelOpp||''}',${!!isDouble})"><span class="ch-ltr">${['A','B','C','D'][i]}</span><span>${c}</span></button>`).join('');$('m-ok').style.display='none';}
+  else{mc.innerHTML='';if(!hideOk){$('m-ok').style.display='block';if(ok)$('m-ok').onclick=ok}else $('m-ok').style.display='none';}
+  $('modal').classList.add('show');
+}
+window.closeModal=()=>$('modal').classList.remove('show');
+window.showRef=()=>openModal({badge:'mb-info',bt:'📚 Lý Thuyết Ch.4',title:'Tóm Tắt — DC XHCN VN',
+  body:`<div style="display:flex;flex-direction:column;gap:9px">${[['⭐','Bản Chất DC XHCN','GC công nhân, Đảng CSVN lãnh đạo. HP 2013 Đ.2: "Tất cả quyền lực NN thuộc về Nhân dân."'],['🔺','Tam Trụ HTCT','Đảng lãnh đạo (đường lối, cán bộ, kiểm tra, nêu gương). Nhà nước quản lý. Nhân dân làm chủ qua 6 quyền cơ sở.'],['🗳️','6 Quyền DC Cơ Sở (Luật THDC 2022)','① Dân biết ② Dân bàn ③ Dân làm ④ Dân kiểm tra ⑤ Dân giám sát ⑥ Dân thụ hưởng.'],['🏛️','NN Pháp Quyền XHCN','HP-PL có giá trị tối cao, NN phải tuân; quyền lực thống nhất, có phân công phối hợp và kiểm soát.'],['💡','Giải Pháp DC Thực Chất','Nâng dân trí; hoàn thiện PL; cán bộ gương mẫu; chuyển đổi số; xử lý nghiêm cản trở DC.']].map(([ic,ti,tx])=>`<div style="background:rgba(212,160,23,.04);border:1px solid rgba(212,160,23,.1);border-radius:9px;padding:9px 11px"><div style="font-weight:700;color:var(--gold2);margin-bottom:2px">${ic} ${ti}</div><div style="font-size:11px;color:rgba(245,240,255,.6);line-height:1.7">${tx}</div></div>`).join('')}</div>`,
+  ok:closeModal});
+
+function showWin(s){
+  showScreen('s-win');confetti();
+  const ord=s.order||[];const sorted=[...ord].sort((a,b)=>(s.players[b]?.score||0)-(s.players[a]?.score||0));
+  const tops=sorted.slice(0,Math.min(3,sorted.length));
+  const po=tops.length===1?[tops[0]]:tops.length===2?[tops[1],tops[0]]:[tops[1],tops[0],tops[2]];
+  const hs=[64,96,46],lbs=['🥈','🏆','🥉'],bc2=['linear-gradient(180deg,#8A8A9A,#5A5A6A)','linear-gradient(180deg,#F1C40F,#C8A010)','linear-gradient(180deg,#CD7F32,#8B4500)'];
+  $('win-podium').innerHTML=po.map((pid,i)=>{const p=s.players[pid];const pal=getP(p);return`<div class="pod-item"><div style="font-size:26px">${lbs[i]}</div><div class="pod-bar" style="height:${hs[i]}px;background:${bc2[i]}">${p?.emoji||''}<br><span style="font-size:12px">${p?.score||0}</span></div><div style="font-size:10px;font-weight:700;margin-top:3px">${p?.name||'?'}</div></div>`}).join('');
+  $('win-table').innerHTML=sorted.map((pid,i)=>{const p=s.players[pid];const pal=getP(p);return`<div class="rank-row"><div style="font-size:16px;width:28px;text-align:center">${['🥇','🥈','🥉','4.','5.','6.'][i]||`${i+1}.`}</div><div style="font-size:14px">${p?.emoji||''}</div><div style="font-size:13px;font-weight:700;flex:1;text-align:left">${p?.name||'?'} ${(p?.wins||0)>0?'⭐'.repeat(Math.min(p.wins,5)):''}</div><div style="font-family:'Dela Gothic One',sans-serif;font-size:18px;color:${pal.bd}">${p?.score||0}</div></div>`}).join('');
+  const winner=s.players[sorted[0]];
+  $('win-legend').innerHTML=`🏆 <b>${winner?.emoji||''} ${winner?.name||'?'}</b> — Công Dân Kiểu Mẫu của Làng Phước Dân!`;
+}
+
+function confetti(){const c=['#C0392B','#D4A017','#F1C40F','#27AE60','#3498DB','#9B59B6'];for(let i=0;i<130;i++){const el=document.createElement('div');el.className='confetti-p';el.style.cssText=`left:${Math.random()*100}vw;width:${4+Math.random()*9}px;height:${4+Math.random()*9}px;background:${c[~~(Math.random()*c.length)]};animation-duration:${1.4+Math.random()*2}s;animation-delay:${Math.random()*1.1}s;border-radius:${Math.random()>.5?'50%':'2px'}`;document.body.appendChild(el);setTimeout(()=>el.remove(),4500)}}
+
+const getState=async()=>{const r=await get_('get',{code:myRoom});if(r.ok)G=r.state;return G};
+const apiSaveP=(pid,data)=>post('updatePlayer',{code:myRoom,pid,data}).then(r=>{if(r.ok)G=r.state});
+const apiPatch=patch=>post('update',{code:myRoom,patch}).then(r=>{if(r.ok)G=r.state});
+window.addEventListener('resize',()=>{const b=$('board');if(!b||!$('s-admin').classList.contains('active'))return;const sz=Math.min(window.innerWidth-340,window.innerHeight-56,700);b.style.width=b.style.height=Math.max(280,sz)+'px'});
+</script>
+</body></html>
