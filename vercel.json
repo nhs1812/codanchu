@@ -1,8 +1,7 @@
 {
   "version": 2,
   "rewrites": [
-    { "source": "/admin", "destination": "/public/admin.html" },
-    { "source": "/play", "destination": "/public/play.html" },
-    { "source": "/(.*)", "destination": "/public/$1" }
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/play", "destination": "/play.html" }
   ]
 }
