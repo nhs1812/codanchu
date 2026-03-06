@@ -64,8 +64,8 @@ button{cursor:pointer;font-family:inherit;border:none;outline:none}
 .cell.lft .cband{right:0;top:0;bottom:0;width:21%}
 .cell.rgt .cband{left:0;top:0;bottom:0;width:21%}
 .band-r{background:linear-gradient(#E74C3C,#C0392B)}.band-g{background:linear-gradient(#A07810,#F1C40F)}.band-gr{background:linear-gradient(#1A5C2A,#2ECC71)}.band-bl{background:linear-gradient(#1A3A6A,#3498DB)}.band-pu{background:linear-gradient(#4A1478,#9B59B6)}.band-or{background:linear-gradient(#7A3000,#E67E22)}.band-cy{background:linear-gradient(#006655,#1ABC9C)}
-.c-icon{font-size:clamp(4px,.95vw,10px);line-height:1;margin-bottom:1px;position:relative;z-index:2}
-.c-name{font-size:clamp(3px,.45vw,5px);font-weight:700;color:rgba(245,240,255,.82);text-align:center;line-height:1.2;padding:0 1px;max-height:2.8em;overflow:hidden;position:relative;z-index:2}
+.c-icon{font-size:clamp(6px,1.3vw,14px);line-height:1;margin-bottom:1px;position:relative;z-index:2}
+.c-name{font-size:clamp(4px,.55vw,7px);font-weight:700;color:rgba(245,240,255,.82);text-align:center;line-height:1.2;padding:0 1px;max-height:2.8em;overflow:hidden;position:relative;z-index:2}
 .cell-start{background:linear-gradient(135deg,rgba(100,0,0,.5),rgba(192,57,43,.3))!important;border:2px solid rgba(192,57,43,.55)!important}
 .cell-reform{background:linear-gradient(135deg,rgba(74,20,120,.55),rgba(30,0,60,.45))!important;border:2px solid rgba(155,89,182,.5)!important}
 .cell-park{background:linear-gradient(135deg,rgba(26,92,42,.4),rgba(10,50,25,.35))!important;border:2px solid rgba(46,204,113,.4)!important}
@@ -140,10 +140,12 @@ button{cursor:pointer;font-family:inherit;border:none;outline:none}
   </div>
   <div class="pv-turn" id="pv-turn"><span id="pv-turn-txt">Đang chờ...</span></div>
   <div class="pv-board-wrap">
-    <div style="position:relative;width:min(calc(100vw - 8px),calc(100vh - 210px),420px);height:min(calc(100vw - 8px),calc(100vh - 210px),420px)">
+    <div style="position:relative;width:min(calc(100vw - 4px),calc(100vh - 180px),560px);height:min(calc(100vw - 4px),calc(100vh - 180px),560px)">
       <div class="board-grid-pv" id="pv-grid"></div>
-      <div style="position:absolute;top:calc(100%/11);left:calc(100%/11);right:calc(100%/11);bottom:calc(100%/11);display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse,rgba(28,10,50,.97),rgba(7,4,11,.99));border:1px solid rgba(212,160,23,.1);border-radius:4px;gap:4px">
-        <div style="font-size:clamp(5px,.8vw,8px);font-weight:700;color:rgba(212,160,23,.35);letter-spacing:.5px;text-align:center">LÀNG<br>PHƯỚC DÂN</div>
+      <div style="position:absolute;top:calc(100%/11);left:calc(100%/11);right:calc(100%/11);bottom:calc(100%/11);display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse,rgba(28,10,50,.97),rgba(7,4,11,.99));border:1px solid rgba(212,160,23,.1);border-radius:4px;gap:2px;overflow:hidden;padding:3px">
+        <div id="pv-center-flag" style="flex-shrink:0"></div>
+        <div style="font-family:'Dela Gothic One',sans-serif;font-size:clamp(8px,2.2vw,18px);background:linear-gradient(135deg,#FFF9C4,#F1C40F,#E74C3C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;line-height:1;letter-spacing:.5px">CỜ DÂN CHỦ</div>
+        <div style="font-size:clamp(4px,1vw,8px);font-weight:700;color:rgba(212,160,23,.35);letter-spacing:.5px;text-align:center">DÂN CHỦ XHCN</div>
         <div id="pv-dice-row" style="display:flex;gap:3px"></div>
       </div>
     </div>
@@ -221,6 +223,9 @@ function handleLobby(s){
 let pvBuilt=false;
 function buildPVBoard(){
   if(pvBuilt)return;pvBuilt=true;
+  // Render animated flag in center
+  const cf=$('pv-center-flag');
+  if(cf){const boardSz=cf.closest('[style*="min("]')?.offsetWidth||300;const fs=Math.max(0.4,boardSz/560);const pw=Math.round(2.5*fs),fh=Math.round(44*fs),fw=Math.round(66*fs);cf.innerHTML=`<div class="vn-flag-wrap"><div style="width:${pw}px;height:${fh}px" class="vn-pole"></div><svg class="vn-flag-svg" width="${fw}" height="${fh}" viewBox="0 0 120 80"><defs><clipPath id="pvcf"><path class="vn-flag-body" d="M0,0 Q30,5 60,0 Q90,-5 120,0 L120,80 Q90,85 60,80 Q30,75 0,80 Z"/></clipPath></defs><path class="vn-flag-body" d="M0,0 Q30,5 60,0 Q90,-5 120,0 L120,80 Q90,85 60,80 Q30,75 0,80 Z" fill="#D42B2B"/><polygon class="vn-star" points="60,10 64.7,23.6 79,23.6 67.6,31.4 72.4,45 60,37.2 47.6,45 52.4,31.4 41,23.6 55.3,23.6" clip-path="url(#pvcf)"/></svg></div>`;}
   const pg=$('pv-grid');if(!pg||pg.children.length)return;
   function cellPos(i){if(i<11)return{r:10,c:10-i};if(i<21)return{r:10-(i-10),c:0};if(i<31)return{r:0,c:i-20};return{r:i-30,c:10}}
   for(let r=0;r<11;r++){for(let c=0;c<11;c++){

@@ -175,6 +175,8 @@ button{cursor:pointer;font-family:inherit;border:none;outline:none}
 .m-fb{min-height:16px;font-size:13px;font-weight:700;text-align:center;margin-bottom:8px}
 .m-ok{width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--red2),var(--red));color:var(--gold2);font-family:'Dela Gothic One',sans-serif;font-size:15px;cursor:pointer;letter-spacing:1.5px;box-shadow:0 4px 18px var(--rg);transition:all .25s}
 .m-ok:hover{transform:translateY(-2px)}
+.q-timer-bar{height:5px;border-radius:3px;background:linear-gradient(90deg,var(--red2),var(--gold2));transition:width .1s linear;margin-bottom:10px}
+.q-timer-txt{font-size:11px;font-weight:700;text-align:center;margin-bottom:6px;color:var(--gold2)}
 .jail-visual{display:flex;align-items:center;justify-content:center;margin:12px 0;height:80px;background:rgba(74,20,120,.1);border:1px solid rgba(155,89,182,.25);border-radius:12px;overflow:hidden;position:relative}
 .jail-bar-modal{width:8px;border-radius:3px;background:linear-gradient(180deg,rgba(155,89,182,.8),rgba(100,50,150,.5));flex-shrink:0;margin:0 4px}
 .escape-hint{background:linear-gradient(135deg,rgba(74,20,120,.2),rgba(30,0,60,.15));border:1px solid rgba(155,89,182,.3);border-radius:12px;padding:12px;margin:8px 0;animation:escapeFlash 2s ease-in-out infinite}
@@ -217,7 +219,7 @@ button{cursor:pointer;font-family:inherit;border:none;outline:none}
 
 <!-- LOBBY -->
 <div class="screen" id="s-lobby">
-<div style="max-width:480px;width:100%;padding:20px">
+<div style="max-width:480px;width:100%;padding:20px;text-align:center">
   <div class="card">
     <div class="err" id="err-c"></div>
     <div class="lbl">SỐ VÒNG ĐẤU</div>
@@ -315,6 +317,7 @@ button{cursor:pointer;font-family:inherit;border:none;outline:none}
     <div class="m-theory" id="m-theory" style="display:none"></div>
     <div class="m-rw" id="m-rw" style="display:none"></div>
     <div class="m-choices" id="m-choices"></div>
+    <div id="m-timer" style="display:none"><div class="q-timer-txt" id="m-timer-txt">⏱ 15</div><div class="q-timer-bar" id="m-timer-bar" style="width:100%"></div></div>
     <div id="m-game" style="display:none"></div>
     <div class="m-fb" id="m-fb"></div>
     <button class="m-ok" id="m-ok" onclick="closeModal()">Tiếp Tục →</button>
@@ -323,6 +326,22 @@ button{cursor:pointer;font-family:inherit;border:none;outline:none}
 
 <script>
 const $=id=>document.getElementById(id);
+let _qTimer=null,_qTimerSecs=0;
+function startQTimer(secs,onExpire){
+  clearQTimer();_qTimerSecs=secs;
+  const bar=$('m-timer-bar'),txt=$('m-timer-txt');
+  const wrap=$('m-timer');if(wrap)wrap.style.display='block';
+  const step=100;let elapsed=0;const total=secs*1000;
+  _qTimer=setInterval(()=>{
+    elapsed+=step;const left=Math.max(0,total-elapsed);const pct=(left/total*100).toFixed(1);
+    const secsLeft=Math.ceil(left/1000);
+    if(bar)bar.style.width=pct+'%';
+    if(bar)bar.style.background=secsLeft<=5?'linear-gradient(90deg,#C0392B,#E74C3C)':'linear-gradient(90deg,var(--red2),var(--gold2))';
+    if(txt)txt.textContent=`⏱ ${secsLeft}`;
+    if(elapsed>=total){clearQTimer();if(onExpire)onExpire();}
+  },step);
+}
+function clearQTimer(){if(_qTimer){clearInterval(_qTimer);_qTimer=null;}const w=$('m-timer');if(w)w.style.display='none';}
 const API='/api/game';
 const post=(action,body)=>fetch(`${API}?action=${action}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
 const get_=(action,params)=>fetch(`${API}?action=${action}&${new URLSearchParams(params)}`).then(r=>r.json());
@@ -441,15 +460,36 @@ function buildAdminBoard(){
 function buildBoardCenter(){
   const bc=$('bcenter');const board=$('board');
   const s=board.offsetWidth;
-  const orbitDiam=Math.round(s*.28);
-  const nodes=[{a:0,ic:'🏛️'},{a:60,ic:'🗳️'},{a:120,ic:'📋'},{a:180,ic:'👥'},{a:240,ic:'⭐'},{a:300,ic:'🔍'}];
-  const nodesHtml=nodes.map(n=>{const r=orbitDiam/2-8;const x=50+r/orbitDiam*100*Math.cos(n.a*Math.PI/180);const y=50+r/orbitDiam*100*Math.sin(n.a*Math.PI/180);return`<div class="orbit-node" style="left:${x}%;top:${y}%">${n.ic}</div>`}).join('');
-  const flagHtml=buildFlag(.35);
-  const vw=Math.round(s*.55),vh=Math.round(vw*.32);
-  const titleFsz=Math.round(s*.009),subFsz=Math.round(s*.0058);
-  const diceSz=Math.round(s*.032),diceFsz=Math.round(s*.022);
-  const dblDotSz=Math.round(s*.009);
-  bc.innerHTML=`<div class="bc-top"><div class="bc-flag-row">${flagHtml}</div><div class="orbit-wrap" style="width:${orbitDiam}px;height:${orbitDiam}px;flex-shrink:0"><div class="orbit-ring1" style="inset:0"></div><div class="orbit-ring2" style="inset:12%"></div><div class="orbit-ring3" style="inset:24%"></div><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><span class="orbit-center-star" style="font-size:${Math.round(s*.04)}px">⭐</span></div><div class="orbit-nodes" style="position:absolute;inset:0">${nodesHtml}</div></div></div><svg viewBox="0 0 300 90" width="${vw}" height="${vh}" class="bc-village" style="border-radius:3px"><rect width="300" height="90" fill="rgba(10,5,18,.5)"/><path d="M0,82 L55,38 L110,82Z" fill="rgba(25,55,28,.55)"/><path d="M75,82 L142,24 L210,82Z" fill="rgba(20,48,22,.65)"/><path d="M185,82 L238,40 L295,82Z" fill="rgba(25,55,28,.55)"/><rect x="116" y="60" width="58" height="22" fill="rgba(170,85,18,.6)" rx="1"/><path d="M108,60 L145,40 L182,60Z" fill="rgba(190,28,28,.55)"/><text x="145" y="54" text-anchor="middle" fill="rgba(241,196,15,.75)" font-size="5.5" font-family="sans-serif" font-weight="bold">UBND XÃ</text><rect x="128" y="68" width="8" height="14" fill="rgba(60,30,5,.5)"/></svg><div style="width:100%;text-align:center;flex-shrink:0"><div class="bc-title" style="font-size:${titleFsz}px">LÀNG XÃ PHƯỚC DÂN</div><div class="bc-sub" style="font-size:${subFsz}px;margin-bottom:2px">DÂN CHỦ XHCN · CH.4</div><div class="dice-row" style="justify-content:center;margin:${Math.round(s*.004)}px 0"><div class="die" id="die1" style="width:${diceSz}px;height:${diceSz}px;font-size:${diceFsz}px">🎲</div><div class="die" id="die2" style="width:${diceSz}px;height:${diceSz}px;font-size:${diceFsz}px">🎲</div></div><div class="double-streak" style="justify-content:center;margin-bottom:${Math.round(s*.005)}px"><div class="dstreak-dot" id="ds1" style="width:${dblDotSz}px;height:${dblDotSz}px"></div><div class="dstreak-dot" id="ds2" style="width:${dblDotSz}px;height:${dblDotSz}px"></div><div class="dstreak-dot" id="ds3" style="width:${dblDotSz}px;height:${dblDotSz}px"></div><span style="font-size:${Math.round(s*.006)}px;font-weight:700;color:rgba(192,57,43,.55);letter-spacing:.5px;margin-left:2px">ĐÔI</span></div><button class="roll-btn" id="roll-btn-bc" style="font-size:${Math.round(s*.0095)}px" onclick="doRoll()">🎲 TUNG XÚC XẮC</button></div>`;
+  const diceSz=Math.round(s*.038),diceFsz=Math.round(s*.026);
+  const dblDotSz=Math.round(s*.01);
+  const titleFsz=Math.max(11,Math.round(s*.022));
+  const subFsz=Math.max(7,Math.round(s*.007));
+  // Big waving flag SVG
+  const fw=Math.round(s*.38),fh=Math.round(fw*.62);
+  const poleW=Math.max(4,Math.round(fw*.03)),poleH=Math.round(fh*1.05);
+  const flagW=Math.round(fw*.85),flagH=Math.round(fh*.62);
+  const starR=Math.round(flagH*.22);
+  const cx=flagW/2, cy=flagH/2;
+  function starPts(cx,cy,r,ir,n){let pts='';for(let i=0;i<n*2;i++){const a=i*Math.PI/n-Math.PI/2;const rr=i%2===0?r:ir;pts+=`${cx+rr*Math.cos(a)},${cy+rr*Math.sin(a)} `}return pts.trim()}
+  const bigFlag=`<svg viewBox="0 0 ${fw} ${fh}" width="${fw}" height="${fh}" style="display:block;overflow:visible">
+    <rect x="${poleW-2}" y="0" width="${poleW}" height="${poleH}" rx="2" fill="url(#pole)" />
+    <defs>
+      <linearGradient id="pole" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="#FFE066"/><stop offset="40%" stop-color="#9A7000"/><stop offset="80%" stop-color="#FFE066"/><stop offset="100%" stop-color="#9A7000"/></linearGradient>
+    </defs>
+    <g transform="translate(${poleW+2},4)">
+      <path class="vn-flag-body" d="M0,0 Q${flagW*.25},${flagH*.06} ${flagW*.5},0 Q${flagW*.75},${-flagH*.06} ${flagW},0 L${flagW},${flagH} Q${flagW*.75},${flagH*1.06} ${flagW*.5},${flagH} Q${flagW*.25},${flagH*.94} 0,${flagH} Z" fill="#D0021B"/>
+      <polygon class="vn-star" points="${starPts(cx,cy,starR,starR*.42,5)}" transform="translate(0,0)"/>
+    </g>
+  </svg>`;
+  bc.innerHTML=`
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:space-between;height:100%;width:100%;padding:3px 2px;gap:2px">
+      <div style="display:flex;justify-content:center;flex-shrink:0">${bigFlag}</div>
+      <div style="font-family:'Dela Gothic One',sans-serif;font-size:${titleFsz}px;background:linear-gradient(135deg,#FFF9C4,#F1C40F,#E74C3C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;line-height:1;letter-spacing:1px">CỜ DÂN CHỦ</div>
+      <div style="font-size:${subFsz}px;font-weight:700;color:rgba(212,160,23,.38);letter-spacing:.8px;text-align:center">DÂN CHỦ XHCN · CH.4</div>
+      <div class="dice-row" style="justify-content:center;flex-shrink:0"><div class="die" id="die1" style="width:${diceSz}px;height:${diceSz}px;font-size:${diceFsz}px">🎲</div><div class="die" id="die2" style="width:${diceSz}px;height:${diceSz}px;font-size:${diceFsz}px">🎲</div></div>
+      <div class="double-streak" style="justify-content:center;flex-shrink:0"><div class="dstreak-dot" id="ds1" style="width:${dblDotSz}px;height:${dblDotSz}px"></div><div class="dstreak-dot" id="ds2" style="width:${dblDotSz}px;height:${dblDotSz}px"></div><div class="dstreak-dot" id="ds3" style="width:${dblDotSz}px;height:${dblDotSz}px"></div><span style="font-size:${Math.round(s*.006)}px;font-weight:700;color:rgba(192,57,43,.55);letter-spacing:.5px;margin-left:2px">ĐÔI</span></div>
+      <button class="roll-btn" id="roll-btn-bc" style="font-size:${Math.round(s*.011)}px;flex-shrink:0" onclick="doRoll()">🎲 TUNG XÚC XẮC</button>
+    </div>`;
 }
 
 function renderAdmin(s){
@@ -602,7 +642,7 @@ function doLucky(s,pi,isDouble){
 }
 
 window.handleAns=async(idx,ans,pts,pi,duelOpp,isDouble)=>{
-  if(answered)return;answered=true;
+  if(answered)return;answered=true;clearQTimer();
   document.querySelectorAll('.m-ch').forEach((b,i)=>{b.classList.add('locked');if(i===ans)b.classList.add('correct');else if(i===idx)b.classList.add('wrong');b.onclick=null});
   const s=await getState();const ord=s.order||[];
   const ok=idx===ans;const p={...s.players[ord[pi]]};const fb=$('m-fb');
@@ -643,11 +683,13 @@ function openModal({badge,bt,title,body,jailViz,theory,rw,rwBad,choices,ans,pts,
   const mw=$('m-rw');
   if(rw){mw.style.display='inline-flex';mw.className='m-rw '+(rwBad?'rw-bad':'rw-good');mw.textContent=rw}else mw.style.display='none';
   const mc=$('m-choices');
-  if(choices?.length){mc.innerHTML=choices.map((c,i)=>`<button class="m-ch" onclick="handleAns(${i},${ans},${pts},${pi},'${duelOpp||''}',${!!isDouble})"><span class="ch-ltr">${['A','B','C','D'][i]}</span><span>${c}</span></button>`).join('');$('m-ok').style.display='none';}
+  if(choices?.length){mc.innerHTML=choices.map((c,i)=>`<button class="m-ch" onclick="handleAns(${i},${ans},${pts},${pi},'${duelOpp||''}',${!!isDouble})"><span class="ch-ltr">${['A','B','C','D'][i]}</span><span>${c}</span></button>`).join('');$('m-ok').style.display='none';
+    startQTimer(15,()=>{if(!answered)handleAns(-1,ans,pts,pi,duelOpp||'',!!isDouble);});
+  }
   else{mc.innerHTML='';if(!hideOk){$('m-ok').style.display='block';if(ok)$('m-ok').onclick=ok}else $('m-ok').style.display='none';}
   $('modal').classList.add('show');
 }
-window.closeModal=()=>$('modal').classList.remove('show');
+window.closeModal=()=>{$('modal').classList.remove('show');clearQTimer();}
 window.showRef=()=>openModal({badge:'mb-info',bt:'📚 Lý Thuyết Ch.4',title:'Tóm Tắt — DC XHCN VN',
   body:`<div style="display:flex;flex-direction:column;gap:9px">${[['⭐','Bản Chất DC XHCN','GC công nhân, Đảng CSVN lãnh đạo. HP 2013 Đ.2: "Tất cả quyền lực NN thuộc về Nhân dân."'],['🔺','Tam Trụ HTCT','Đảng lãnh đạo (đường lối, cán bộ, kiểm tra, nêu gương). Nhà nước quản lý. Nhân dân làm chủ qua 6 quyền cơ sở.'],['🗳️','6 Quyền DC Cơ Sở (Luật THDC 2022)','① Dân biết ② Dân bàn ③ Dân làm ④ Dân kiểm tra ⑤ Dân giám sát ⑥ Dân thụ hưởng.'],['🏛️','NN Pháp Quyền XHCN','HP-PL có giá trị tối cao, NN phải tuân; quyền lực thống nhất, có phân công phối hợp và kiểm soát.'],['💡','Giải Pháp DC Thực Chất','Nâng dân trí; hoàn thiện PL; cán bộ gương mẫu; chuyển đổi số; xử lý nghiêm cản trở DC.']].map(([ic,ti,tx])=>`<div style="background:rgba(212,160,23,.04);border:1px solid rgba(212,160,23,.1);border-radius:9px;padding:9px 11px"><div style="font-weight:700;color:var(--gold2);margin-bottom:2px">${ic} ${ti}</div><div style="font-size:11px;color:rgba(245,240,255,.6);line-height:1.7">${tx}</div></div>`).join('')}</div>`,
   ok:closeModal});
