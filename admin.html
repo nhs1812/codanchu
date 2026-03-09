@@ -868,14 +868,6 @@ function doLucky(s,pi,isDouble){
 window.handleAns=async(idx,ans,pts,pi,duelOpp,isDouble)=>{
   if(answered)return;answered=true;clearQTimer();
   document.querySelectorAll('.m-ch').forEach((b,i)=>{b.classList.add('locked');if(i===ans)b.classList.add('correct');else if(i===idx)b.classList.add('wrong');b.onclick=null});
-  // Hiển thị đáp án đúng bên dưới các lựa chọn
-  const th=$('m-theory');
-  if(th&&th.style.display==='none'&&th.textContent){th.style.display='block';}
-  else if(!th||!th.textContent){
-    // Nếu không có theory, hiển thị label đáp án đúng
-    const letters=['A','B','C','D'];const correctBtn=document.querySelectorAll('.m-ch')[ans];
-    if(correctBtn){const answerBox=document.createElement('div');answerBox.style.cssText='background:rgba(26,92,42,.12);border:1px solid rgba(46,204,113,.3);border-radius:9px;padding:9px 13px;font-size:11px;color:#88FFCC;margin-bottom:8px;';answerBox.innerHTML=`✅ <b>Đáp án đúng: ${letters[ans]}</b> — ${correctBtn.querySelector('span:last-child')?.textContent||''}`;const mc=$('m-choices');mc.after(answerBox);}
-  }
   const s=await getState();const ord=s.order||[];
   const ok=idx===ans;const p={...s.players[ord[pi]]};const fb=$('m-fb');
   if(duelOpp){
