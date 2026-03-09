@@ -868,6 +868,14 @@ function doLucky(s,pi,isDouble){
 window.handleAns=async(idx,ans,pts,pi,duelOpp,isDouble)=>{
   if(answered)return;answered=true;clearQTimer();
   document.querySelectorAll('.m-ch').forEach((b,i)=>{b.classList.add('locked');if(i===ans)b.classList.add('correct');else if(i===idx)b.classList.add('wrong');b.onclick=null});
+  // Hiển thị đáp án đúng bên dưới các lựa chọn
+  const th=$('m-theory');
+  if(th&&th.style.display==='none'&&th.textContent){th.style.display='block';}
+  else if(!th||!th.textContent){
+    // Nếu không có theory, hiển thị label đáp án đúng
+    const letters=['A','B','C','D'];const correctBtn=document.querySelectorAll('.m-ch')[ans];
+    if(correctBtn){const answerBox=document.createElement('div');answerBox.style.cssText='background:rgba(26,92,42,.12);border:1px solid rgba(46,204,113,.3);border-radius:9px;padding:9px 13px;font-size:11px;color:#88FFCC;margin-bottom:8px;';answerBox.innerHTML=`✅ <b>Đáp án đúng: ${letters[ans]}</b> — ${correctBtn.querySelector('span:last-child')?.textContent||''}`;const mc=$('m-choices');mc.after(answerBox);}
+  }
   const s=await getState();const ord=s.order||[];
   const ok=idx===ans;const p={...s.players[ord[pi]]};const fb=$('m-fb');
   if(duelOpp){
@@ -900,6 +908,8 @@ function openModal({badge,bt,title,body,jailViz,theory,rw,rwBad,choices,ans,pts,
   $('m-badge').className='m-badge '+(badge||'');$('m-badge').textContent=bt||'';
   $('m-title').textContent=title||'';$('m-body').innerHTML=body||'';
   $('m-fb').textContent='';$('m-game').style.display='none';$('m-game').innerHTML='';
+  // Xóa các box đáp án động từ câu hỏi trước
+  document.querySelectorAll('.m-answer-box').forEach(el=>el.remove());
   const jv=$('m-jail-viz');
   if(jailViz){jv.style.display='block';jv.innerHTML=`<div class="jail-visual">${Array.from({length:12},(_,i)=>`<div class="jail-bar-modal" style="height:${50+Math.random()*40}%;animation:jailBarAnim ${1.8+i*.15}s ease-in-out infinite;animation-delay:${i*.12}s"></div>`).join('')}<div style="position:absolute;font-size:32px;opacity:.15">🏛️</div></div><div class="escape-hint"><div style="font-size:11px;font-weight:700;color:#CC99FF;margin-bottom:6px">🎲 Điều Kiện Thoát:</div><div style="font-size:11px;color:rgba(200,150,255,.8)">Tung xúc xắc ra <b>hai số bằng nhau</b> (đôi)</div><div class="escape-dice"><div class="ed">⚁</div><div class="ed">⚁</div></div></div>`;}
   else jv.style.display='none';
