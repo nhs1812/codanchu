@@ -125,7 +125,7 @@ button{cursor:pointer;font-family:inherit;border:none;outline:none}
 .bc-img-placeholder:hover{border-color:rgba(212,160,23,.5);background:linear-gradient(160deg,rgba(40,15,80,.9),rgba(12,5,25,.95))}
 .bc-flag-overlay{position:absolute;top:6px;left:8px;pointer-events:none}
 .dice-row{display:flex;gap:4px;align-items:center}
-.die{border-radius:6px;background:linear-gradient(145deg,#FFF8E0,#EDD090);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;box-shadow:3px 3px 0 rgba(0,0,0,.5);transform-style:preserve-3d;transition:all .12s;flex-shrink:0}
+.die{border-radius:6px;background:linear-gradient(145deg,#2a2a2a,#111);border:2px solid #555;display:flex;align-items:center;justify-content:center;box-shadow:3px 3px 0 rgba(0,0,0,.8),0 0 10px rgba(0,0,0,.6);transform-style:preserve-3d;transition:all .12s;flex-shrink:0}
 .die.rolling{animation:dieRoll .1s steps(1) infinite}
 .die.flash{animation:dblFlash .35s ease 4}
 .double-streak{display:flex;align-items:center;gap:3px}
@@ -470,7 +470,7 @@ function buildBoardCenter(){
   const bw=board.offsetWidth,bh=board.offsetHeight;
   const COLS=13,ROWS=9;
   const cellW=bw/COLS,cellH=bh/ROWS;
-  const diceSz=Math.round(cellH*.65),diceFsz=Math.round(cellH*.44);
+  const diceSz=Math.round(cellH*.95),diceFsz=Math.round(cellH*.65);
   const dotSz=Math.round(cellH*.22);
   const titleFsz=Math.max(8,Math.round(bw*.016));
   const btnFsz=Math.max(8,Math.round(bw*.012));
