@@ -913,7 +913,7 @@ function openModal({badge,bt,title,body,jailViz,theory,rw,rwBad,choices,ans,pts,
   const jv=$('m-jail-viz');
   if(jailViz){jv.style.display='block';jv.innerHTML=`<div class="jail-visual">${Array.from({length:12},(_,i)=>`<div class="jail-bar-modal" style="height:${50+Math.random()*40}%;animation:jailBarAnim ${1.8+i*.15}s ease-in-out infinite;animation-delay:${i*.12}s"></div>`).join('')}<div style="position:absolute;font-size:32px;opacity:.15">🏛️</div></div><div class="escape-hint"><div style="font-size:11px;font-weight:700;color:#CC99FF;margin-bottom:6px">🎲 Điều Kiện Thoát:</div><div style="font-size:11px;color:rgba(200,150,255,.8)">Tung xúc xắc ra <b>hai số bằng nhau</b> (đôi)</div><div class="escape-dice"><div class="ed">⚁</div><div class="ed">⚁</div></div></div>`;}
   else jv.style.display='none';
-  const th=$('m-theory');th.style.display=theory?'block':'none';if(theory)th.textContent=theory;
+  const th=$('m-theory');if(theory){th.textContent=theory;th.style.display=choices?.length?'none':'block';}else{th.style.display='none';th.textContent='';}
   const mw=$('m-rw');
   if(rw){mw.style.display='inline-flex';mw.className='m-rw '+(rwBad?'rw-bad':'rw-good');mw.textContent=rw}else mw.style.display='none';
   const mc=$('m-choices');
